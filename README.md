@@ -41,11 +41,12 @@ Make sure you give a correct FEN string and valid moves. No legality checks are 
 
 
 ## Code Highlights
-The function "makeMove(fen, move)" is the heart of the ChessDiagram. It takes a FEN string (Forsyth Edwards notation, an easy standard description of a chess position) and a move string in algebraic notation (see the example above) and computes the FEN string of the resulting position. This is done by some complex aptplications of the RegExp object in javascript, without fiddling around with internal board representations.
+The function "makeMove(fen, move)" is the heart of ChessDiagram. It takes a FEN string (Forsyth Edwards notation, an easy standard description of a chess position) and a move string in algebraic notation (see the example above) and computes the FEN string of the resulting position. This is done by some complex applications of the RegExp object in javascript, without fiddling around with internal board representations.
 
 ## ToDo
+* Providing a one click example.
 * Completing documentation.
 * Checking more browsers for correct functionality.
 * Checking all branches of move generation.
-* More functionalies?
+* More features?
 * Convincing the guys from wikipedia to use these diagrams instead of pictures.  :))
