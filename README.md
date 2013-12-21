@@ -28,7 +28,7 @@ ChessDiagram.diagram('diag02',
 ```
 This will show a chessboard with three buttons to play back and forth in a provided movelist.
 At any point you may make your own moves on the board by dragging pieces around to check other variations.
-See "Lucena.htm" in the examples for an explanation of a chess endgame that I copied from wikipedia. I replaced all the pictures by "living" diagrams and think it's less cumbersome to read.
+See ["Lucena.htm"](http://www.lteichert.de/chessdiagramjs/examples/Lucena.htm) for an explanation of a chess endgame that I copied from wikipedia. I replaced all the pictures by "living" diagrams and think it's less cumbersome to read.
 
 The only method of the object ChessDiagram that you have to know is "diagram". It takes 5 parameters:
 * The id of a div tag on the web page (where the board is placed).
@@ -44,7 +44,6 @@ Make sure you give a correct FEN string and valid moves. No legality checks are 
 The function "makeMove(fen, move)" is the heart of ChessDiagram. It takes a FEN string (Forsyth Edwards notation, an easy standard description of a chess position) and a move string in algebraic notation (see the example above) and computes the FEN string of the resulting position. This is done by some complex applications of the RegExp object in javascript, without fiddling around with internal board representations.
 
 ## ToDo
-* Providing a one click example.
 * Completing documentation.
 * Checking more browsers for correct functionality.
 * Checking all branches of move generation.
