@@ -411,7 +411,10 @@ var ChessDiagram = new function() {
 
     imgPath: function (ip) {
 // in case the workaround for imgPath does not work
-      if (ip != '') { imgPath = ip; };
+      if (ip != '') { 
+        imgPath = ip;
+        pieceTheme = imgPath + 'chesspieces/wikipedia/{piece}.png'
+      };
       return imgPath;
     },
 
@@ -466,11 +469,12 @@ var ChessDiagram = new function() {
           demoBoard.moves[demoBoard.moves.length] = L[i];
         };
       };
-      var html = header + '<br /><div id="' + id + '_board" style="width:' +
-                          document.getElementById(id).style['width'] + '"></div>';
+      var html = header + 
+                 '<br /><div id="' + id + '_board" style="width:' + document.getElementById(id).style['width'] + '"></div>' +
+                 '<input type="button" onclick="ChessDiagram.show(' + bd + ', 0);" value="| &lt;" />';
+
       if (demoBoard.moves.length > 0) {
         html = html +
-           '<input type="button" onclick="ChessDiagram.show(' + bd + ', 0);" value="| &lt;" />' +
            '<input type="button" onclick="ChessDiagram.show(' + bd + ', 1);" value=" &gt; " />' +
            '<input type="button" onclick="ChessDiagram.show(' + bd + ',-1);" value=" &lt; " />';
       };
