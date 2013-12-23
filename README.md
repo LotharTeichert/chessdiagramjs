@@ -2,7 +2,7 @@
 
 This is a javascript implementation of a "living" chess diagram to be used on web pages.
 
-It relies on the nice chessboard.js of Chris Oakman which in turn depends on json and jQuery.
+It is an application of the nice chessboard.js of Chris Oakman which in turn depends on json and jQuery.
 
 ## Usage
 ```html
@@ -16,7 +16,7 @@ It relies on the nice chessboard.js of Chris Oakman which in turn depends on jso
  <script type="text/javascript" src="../js/chessdiagram.js"></script>
 </head>
 ...
-<div id="diag02" style="float:right;margin:0 8;width:280px"></div>
+<div id="diag02" style="float:right;margin:0 8;width:290px"></div>
 <script>
 ChessDiagram.diagram('diag02', 
   '1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1',
@@ -26,18 +26,31 @@ ChessDiagram.diagram('diag02',
 </script>
 ...
 ```
-This will show a chessboard with three buttons to play back and forth in a provided movelist.
+This will show a chessboard with three buttons to play back and forth in the provided move list.
 At any point you may make your own moves on the board by dragging pieces around to check other variations.
 See ["Lucena.htm"](http://www.lteichert.de/chessdiagramjs/examples/Lucena.htm) for an explanation of a chess endgame that I copied from wikipedia. I replaced all the pictures by "living" diagrams and think it's less cumbersome to read.
 
-The only method of the object ChessDiagram that you have to know is "diagram". It takes 5 parameters:
+The only method of the generated object **ChessDiagram** that you have to know is **ChessDiagram.diagram**. It takes 5 or 6 parameters:
 * The id of a div tag on the web page (where the board is placed).
 * The description of the initial position as a FEN string.
 * A list of moves in algebraic notation, long or short, English or German, move numbers and move decorations allowed (basically a copy of the explaining text on the web page).
 * Some header string.
 * Some footer string.
+* Optional: an object of options overriding default values.
 
 Make sure you give a correct FEN string and valid moves. No legality checks are made but the disambigation of algebraic short notation relies on proper setup.
+
+The options object may contain:
+* *boardWidth* (default `'240px'`): width of the board. Adjust the width of the surrounding div *id*, if any is given, factoring in the width of the board notation!
+* *showNotation* (default `1`): 
+ * 1 = show traditional board notation, 
+ * 2 = show chessboardjs style board notation (inside board), 
+ * 3 = no board notation
+* *notationStyle* (default `'background-color:#f0f0f0;font-family:Lucida Console;font-size:12px;line-height:200%'`): this is the style of a table tag containing the board in its center and the notation (if showNotation = 1) as its first and last rows and columns. Try other values than the given one for changing appearance or when you changed *boardWidth*.
+* *imgPath* (default is a guess from the html script tag assuming the img directory is a sibling of the script directory): give the path to the immages explicitly, if the guess is wrong.
+* *pieceTheme* (default is the guessed *imgPath* + 'chesspieces/wikipedia/{piece}.png'): the pieceTheme of chessboardjs. 
+ 
+If you call ChessDiagram.diagram with options, the new options will hold until they are again overridden by a call to ChessDiagram.diagram with options.
 
 
 ## Code Highlights
