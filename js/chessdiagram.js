@@ -400,23 +400,13 @@ var ChessDiagram = new function() {
   var imgPath = path.split('/').slice(0, -2).join('/') + '/img/'; // remove last filename parts and add directory name
   var pieceTheme = imgPath + 'chesspieces/wikipedia/{piece}.png';
 
+  var notationStyle = 'background-color:#f0f0f0;font-family:Lucida Console;font-size:12px;line-height:200%';
+  var boardWidth = '240px';
+  var showNotation = 1;
+// values for showNotation = 1: traditional notation, 2: Chessboard notation (inside board), 3: no notation, 
+
 // Public ------------------------------------------------------------------------------
   return {
-
-    pieceTheme: function(pt) {
-// in case the workaround for imgPath does not work or another pieceTheme should be used
-      if (pt != '') { pieceTheme = pt; };
-      return pieceTheme;
-    },
-
-    imgPath: function (ip) {
-// in case the workaround for imgPath does not work
-      if (ip != '') { 
-        imgPath = ip;
-        pieceTheme = imgPath + 'chesspieces/wikipedia/{piece}.png'
-      };
-      return imgPath;
-    },
 
     show: function (b, pos) {
 // Show the diagram boards[b]
@@ -446,12 +436,21 @@ var ChessDiagram = new function() {
         imgPath + bd.history[bd.movePtr].split(' ')[1] + '.png';
     },
 
-    diagram: function (id, fen, pgn, header, footer) {
+    diagram: function (id, fen, pgn, header, footer, options) {
 // Generate a chess diagram in div tag with id "id".
 // The starting position is giben by a fen string "fen".
 // A move list is given by "pgn" (see comment in "makeMove" for accepted values).
 // "header" and "footer" are html strings displayed above and below the diagram.
+// options may be used to override default values (the new values will hold
+// until they are changed in another call to "diagram").
 
+      if (options) {
+        if (options['showNotation'])  { showNotation  = options['showNotation']; };
+        if (options['boardWidth'])    { boardWidth    = options['boardWidth']; };
+        if (options['pieceTheme'])    { pieceTheme    = options['pieceTheme']; };
+        if (options['imgPath'])       { imgPath       = options['imgPath']; };
+        if (options['notationStyle']) { notationStyle = options['notationStyle']; };
+      };
       var bd = boards.length;
       if (!header) { header = ''; };
       if (!footer) { footer = ''; };
@@ -469,9 +468,28 @@ var ChessDiagram = new function() {
           demoBoard.moves[demoBoard.moves.length] = L[i];
         };
       };
-      var html = header + 
-                 '<br /><div id="' + id + '_board" style="width:' + document.getElementById(id).style['width'] + '"></div>' +
+      var html;
+      if (showNotation==1) {
+        html = header + '<table border="0" cellpadding="0" cellspacing="0" align="center"' +
+                 'style="' + notationStyle + '">' +
+                 '<tr><th>&nbsp;&nbsp;&nbsp;</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th><th>h</th><th>&nbsp;&nbsp;&nbsp;</th></tr>' +
+                 '<tr><th valign="middle">8</th><td colspan="8" rowspan="8">' +
+                 '<div id="' + id + '_board" style="width:' + boardWidth + '"></div>' +
+                 '</td><th valign="middle">8</th></tr>' +
+                 '<tr><th valign="middle">7</th><th valign="middle">7</th></tr>' +
+                 '<tr><th valign="middle">6</th><th valign="middle">6</th></tr>' +
+                 '<tr><th valign="middle">5</th><th valign="middle">5</th></tr>' +
+                 '<tr><th valign="middle">4</th><th valign="middle">4</th></tr>' +
+                 '<tr><th valign="middle">3</th><th valign="middle">3</th></tr>' +
+                 '<tr><th valign="middle">2</th><th valign="middle">2</th></tr>' +
+                 '<tr><th valign="middle">1</th><th valign="middle">1</th></tr>' +
+                 '<tr><th>&nbsp</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th><th>h</th><th>&nbsp;</th></tr></table>' +
                  '<input type="button" onclick="ChessDiagram.show(' + bd + ', 0);" value="| &lt;" />';
+      } else {
+        html = header +
+                 '<br /><div id="' + id + '_board" style="width:' + boardWidth + '"></div>' +
+                 '<input type="button" onclick="ChessDiagram.show(' + bd + ', 0);" value="| &lt;" />';
+      };
 
       if (demoBoard.moves.length > 0) {
         html = html +
@@ -487,7 +505,7 @@ var ChessDiagram = new function() {
       demoBoard.board =  new ChessBoard(id + '_board', {
                                         draggable:     true, 
                                         dropOffBoard:  'trash', 
-                                        showNotation:  false,
+                                        showNotation:  (showNotation==2),
                                         pieceTheme:    pieceTheme, 
                                         position:      fen,
                                         onDrop:        function(source, target, piece, newPos, oldPos, orientation) {
