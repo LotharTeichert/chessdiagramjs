@@ -23,21 +23,21 @@ var ChessDiagram = new function() {
   B: [/(B.{9}(?:1.{9}){0,7}x)/, /(B.{7}(?:1.{7}){0,7}x)/, /(x.{9}(?:1.{9}){0,7}B)/, /(x.{7}(?:1.{7}){0,7}B)/],
   Q: [/(Q1{0,7}x)/, /(Q.{8}(?:1.{8}){0,7}x)/, /(Q.{9}(?:1.{9}){0,7}x)/, /(Q.{7}(?:1.{7}){0,7}x)/,
       /(x1{0,7}Q)/, /(x.{8}(?:1.{8}){0,7}Q)/, /(x.{9}(?:1.{9}){0,7}Q)/, /(x.{7}(?:1.{7}){0,7}Q)/],
-  N: [/(N.{6}x)[^\/]/, /(N.{9}[^\/]x)/, /(N.{16}[^\/]x)/, /(N.{18}[^\/]x)/,
-      /(x.{6}N)[^\/]/, /(x.{9}[^\/]N)/, /(x.{16}[^\/]N)/, /(x.{18}[^\/]N)/],
+  N: [/(N.{6}x)[^\/]/, /(N.{9}[^\/]x)/, /(N.{15}[^\/]x)/, /(N.{17}[^\/]x)/,
+      /(x.{6}N)[^\/]/, /(x.{9}[^\/]N)/, /(x.{15}[^\/]N)/, /(x.{17}[^\/]N)/],
   k: [/(k(?:.?.?.{7})?x)/, /(x(?:.?.?.{7})?k)/],
   r: [/(r1{0,7}x)/, /(r.{8}(?:1.{8}){0,7}x)/, /(x1{0,7}r)/, /(x.{8}(?:1.{8}){0,7}r)/],
   b: [/(b.{9}(?:1.{9}){0,7}x)/, /(b.{7}(?:1.{7}){0,7}x)/, /(x.{9}(?:1.{9}){0,7}b)/, /(x.{7}(?:1.{7}){0,7}b)/],
   q: [/(q1{0,7}x)/, /(q.{8}(?:1.{8}){0,7}x)/, /(q.{9}(?:1.{9}){0,7}x)/, /(q.{7}(?:1.{7}){0,7}x)/,
       /(x1{0,7}q)/, /(x.{8}(?:1.{8}){0,7}q)/, /(x.{9}(?:1.{9}){0,7}q)/, /(x.{7}(?:1.{7}){0,7}q)/],
-  n: [/(n.{6}x)[^\/]/, /(n.{9}[^\/]x)/, /(n.{16}[^\/]x)/, /(n.{18}[^\/]x)/,
-      /(x.{6}n)[^\/]/, /(x.{9}[^\/]n)/, /(x.{16}[^\/]n)/, /(x.{18}[^\/]n)/] 
+  n: [/(n.{6}x)[^\/]/, /(n.{9}[^\/]x)/, /(n.{15}[^\/]x)/, /(n.{17}[^\/]x)/,
+      /(x.{6}n)[^\/]/, /(x.{9}[^\/]n)/, /(x.{15}[^\/]n)/, /(x.{17}[^\/]n)/] 
   };
   var pinPattern = {
-  w: [/K1*o1*[rq]/, /K(?:.{8}1)o(?:.{8}1)*[rq]/, /K(?:.{7}1)*.{7}o(?:.{7}1)*.{7}[bq]/, /K(?:.{9}1)*.{7}o(?:.{9}1)*.{7}[bq]/,
-      /[rq]1*o1*K/, /[rq](?:.{8}1)o(?:.{8}1)*K/, /[bq](?:.{7}1)*.{7}o(?:.{7}1)*.{7}K/, /[bq](?:.{9}1)*.{7}o(?:.{9}1)*.{7}K/],
-  b: [/k1*o1*[RQ]/, /k(?:.{8}1)o(?:.{8}1)*[RQ]/, /k(?:.{7}1)*.{7}o(?:.{7}1)*.{7}[BQ]/, /k(?:.{9}1)*.{7}o(?:.{9}1)*.{7}[BQ]/,
-      /[RQ]1*o1*k/, /[RQ](?:.{8}1)o(?:.{8}1)*k/, /[BQ](?:.{7}1)*.{7}o(?:.{7}1)*.{7}k/, /[BQ](?:.{9}1)*.{7}o(?:.{9}1)*.{7}k/]
+  w: [/K1*o1*[rq]/, /K(?:.{8}1)*.{8}o(?:.{8}1)*.{8}[rq]/, /K(?:.{7}1)*.{7}o(?:.{7}1)*.{7}[bq]/, /K(?:.{9}1)*.{9}o(?:.{9}1)*.{9}[bq]/,
+      /[rq]1*o1*K/, /[rq](?:.{8}1)*.{8}o(?:.{8}1)*.{8}K/, /[bq](?:.{7}1)*.{7}o(?:.{7}1)*.{7}K/, /[bq](?:.{9}1)*.{9}o(?:.{9}1)*.{9}K/],
+  b: [/k1*o1*[RQ]/, /k(?:.{8}1)*.{8}o(?:.{8}1)*.{8}[RQ]/, /k(?:.{7}1)*.{7}o(?:.{7}1)*.{7}[BQ]/, /k(?:.{9}1)*.{9}o(?:.{9}1)*.{9}[BQ]/,
+      /[RQ]1*o1*k/, /[RQ](?:.{8}1)*.{8}o(?:.{8}1)*.{8}k/, /[BQ](?:.{7}1)*.{7}o(?:.{7}1)*.{7}k/, /[BQ](?:.{9}1)*.{9}o(?:.{9}1)*.{9}k/]
   };
   var castlingPattern = /^(?:\d)*(?:\.)*[O0]-[O0](-[O0])?/;
   var pieceMovePattern = /^(?:\d)*(?:\.)*([KDTLSQRBN])([a-h]?)([1-8]?)[-x:]?([a-h])([1-8])/;
@@ -101,28 +101,27 @@ var ChessDiagram = new function() {
 // No move
         };
       };
+    };
 
 // Compress board after move is done
-      board = board.replace(/11111111/g, '8');
-      board = board.replace(/1111111/g, '7');
-      board = board.replace(/111111/g, '6');
-      board = board.replace(/11111/g, '5');
-      board = board.replace(/1111/g, '4');
-      board = board.replace(/111/g, '3');
-      board = board.replace(/11/g, '2');
+    board = board.replace(/11111111/g, '8');
+    board = board.replace(/1111111/g, '7');
+    board = board.replace(/111111/g, '6');
+    board = board.replace(/11111/g, '5');
+    board = board.replace(/1111/g, '4');
+    board = board.replace(/111/g, '3');
+    board = board.replace(/11/g, '2');
 
-      return board + ' ' + 
-             ((sideToMove=='w') ? 'b' : 'w') + ' ' +
-             ((castle == '') ? '-' : castle) + ' ' +
-             ((ep.charAt[0] == '*') ? ep.substr(1, 2) : '-') + ' ' +
-             ((halfMoves == '*') ? '0' : parseInt(halfMoves) + 1) + ' ' +
-             ((sideToMove=='w') ? moveCount : parseInt(moveCount) + 1);
-    };
+    return board + ' ' + 
+           ((sideToMove=='w') ? 'b' : 'w') + ' ' +
+           ((castle == '') ? '-' : castle) + ' ' +
+           ((ep.charAt(0) == '*') ? ep.substr(1, 2) : '-') + ' ' +
+           ((halfMoves == '*') ? '0' : parseInt(halfMoves) + 1) + ' ' +
+           ((sideToMove=='w') ? moveCount : parseInt(moveCount) + 1);
   };
 
   function handleCastling() {
 // moveParts[1] is null for king side (see regular expression)
-
     if (sideToMove == 'w') {
 // White to move
       if (!moveParts[1]) {
@@ -181,7 +180,6 @@ var ChessDiagram = new function() {
         fromPos = (i < fromPosBehindDestination) ? 
                   (destPos - moveDescription[1].length + 1) : 
                   (destPos + moveDescription[1].length - 1);
-
 // Check disambigators, if any
         if (((moveParts[2] == '') || 
              (moveParts[2] == String.fromCharCode('a'.charCodeAt(0) + fromPos % 9))) &&
@@ -197,6 +195,8 @@ var ChessDiagram = new function() {
               break;
             };
           };
+        } else {
+          fromPos = -1;
         };
 // Take the first legal move allowed by disambigators
         if (fromPos >= 0) { break; };
@@ -274,7 +274,7 @@ var ChessDiagram = new function() {
 // Double step
             fromPos = destPos + ((sideToMove == 'w') ? 18 : -18);
             ep = '*' + String.fromCharCode('a'.charCodeAt(0) + destPos % 9) +
-                 ((sideToMove == 'w') ? '4' : '5');
+                 ((sideToMove == 'w') ? '3' : '6');
           } else {
 // Single step
             fromPos = destPos + ((sideToMove == 'w') ? 9 : -9);
@@ -290,10 +290,10 @@ var ChessDiagram = new function() {
             fromPos = destPos + ((sideToMove == 'w') ? 8 : -10);
             if (board.charAt(fromPos) == piece) {
 // Check legality (pins)
-              board1 = board.substr(0, fromPos) + 'o' + board.substr(fromPos + 1, 80);
+              auxBoard = board.substr(0, fromPos) + 'o' + board.substr(fromPos + 1, 80);
               possiblePins = pinPattern[sideToMove];
               for (i = 0; i < possiblePins.length; i++) {
-                if (possiblePins[i].test(board1)) {
+                if (possiblePins[i].test(auxBoard)) {
                   fromPos += 2;
                   break;
                 };
@@ -305,37 +305,48 @@ var ChessDiagram = new function() {
         };
       };
     } else {
-// Destination rank missing
+// Destination rank missing (must be a capture)
       if (moveParts[6] && (moveParts[6] != '')) {
 // ep capture
         destPos = ep.charCodeAt(0) - 'a'.charCodeAt(0) + 
                   9 * ('8'.charCodeAt(0) - ep.charCodeAt(1));
         fromPos = destPos + ((sideToMove == 'w') ? 9 : -9) +
-                  (moveParts[1] < moveParts[3]) ? -1 : 1;
-        board = board.substr(0, destPos) + 'x' + board.substr(destPos + 1, 71);
-        board = board.substr(0, destPos + ((sideToMove=='w') ? 9 : -9)) + '1' + 
-                board.substr(destPos + 1 + ((sideToMove=='w') ? 9 : -9), 71);
+                  ((moveParts[1] < moveParts[3]) ? -1 : 1);
       } else {
 // Check all pawns on disambigator column
         for (fromPos = moveParts[1].charCodeAt(0) - 'a'.charCodeAt(0) + 9;fromPos<62;fromPos+=9) {
           if (board.charAt(fromPos) == piece) {
             destPos = fromPos + ((moveParts[1]<moveParts[3]) ? 1 : -1) + ((sideToMove == 'w') ? -9 : 9);
-            if (((sideToMove == 'w') && (board.charAt(destPos) >= 'a')) ||
-                ((sideToMove != 'w') && (board.charAt(desPos) <= 'Z'))) {
-              board1 = board.substr(0, fromPos) + 'o' + board.substr(fromPos + 1, 80);
-              board1 = board1.substr(0, destPos) + 'x' + board1.substr(destPos + 1, 80);
+            if (((sideToMove == 'w') && (board.charAt(destPos) >= 'a') && (board.charAt(destPos) <= 'z')) ||
+                ((sideToMove != 'w') && (board.charAt(destPos) >= 'A') && (board.charAt(destPos) <= 'Z')) ||
+                ((ep != '-') && (destPos == (ep.charCodeAt(0) - 'a'.charCodeAt(0) + 
+                                             9 * ('8'.charCodeAt(0) - ep.charCodeAt(1)))))) {
+              auxBoard = board.substr(0, fromPos) + 'o' + board.substr(fromPos + 1, 80);
+              auxBoard = auxBoard.substr(0, destPos) + 'x' + auxBoard.substr(destPos + 1, 80);
+              if ((ep != '-') && (destPos == (ep.charCodeAt(0) - 'a'.charCodeAt(0) + 
+                                             9 * ('8'.charCodeAt(0) - ep.charCodeAt(1))))) {
+                auxBoard = auxBoard.substr(0, destPos + ((sideToMove=='w') ? 9 : -9)) + '1' + 
+                           auxBoard.substr(destPos + 1 + ((sideToMove=='w') ? 9 : -9), 71);
+              };
               possiblePins = pinPattern[sideToMove];
               for (i = 0; i < possiblePins.length; i++) {
-                if (possiblePins[i].test(board1)) {
-                  destPos = null;
+                if (possiblePins[i].test(auxBoard)) {
+                  destPos = -1;
                   break;
                 };
               };
-              if (destPos) { break; };
+              if (destPos >= 0) { break; };
             };
           };
+          destPos = -1;
         };
       };
+    };
+    if (destPos < 0) { return; };
+    if ((ep.length==2) && (destPos == (ep.charCodeAt(0) - 'a'.charCodeAt(0) + 
+                                    9 * ('8'.charCodeAt(0) - ep.charCodeAt(1))))) {
+      board = board.substr(0, destPos + ((sideToMove=='w') ? 9 : -9)) + '1' + 
+              board.substr(destPos + 1 + ((sideToMove=='w') ? 9 : -9), 71);
     };
 // Castle state changed? 
     if (sideToMove == 'w') {
@@ -345,6 +356,7 @@ var ChessDiagram = new function() {
       if (destPos == 63)  { castle.replace(/[Q]/g, ''); };
       if (destPos == 70)  { castle.replace(/[K]/g, ''); };
     };
+// Promotion?
     if (moveParts[5] != '') {
       piece = moveParts[5];
 // Translate from German
@@ -394,16 +406,17 @@ var ChessDiagram = new function() {
   };
 
 // Workaround to get the img path
-// We assume the img directory is a sibling to the script directory and its name is "img"
+// We assume the img directory is a sibling of the script directory and its name is "img"
   var scripts = document.getElementsByTagName('script');          // get all scripts on the page, this one is the last!
   var path = scripts[scripts.length-1].src.split('?')[0];         // remove any ?query
   var imgPath = path.split('/').slice(0, -2).join('/') + '/img/'; // remove last filename parts and add directory name
   var pieceTheme = imgPath + 'chesspieces/wikipedia/{piece}.png';
 
+  var divStyle = '-';
   var notationStyle = 'background-color:#f0f0f0;font-family:Lucida Console;font-size:12px;line-height:200%';
   var boardWidth = '240px';
   var showNotation = 1;
-// values for showNotation = 1: traditional notation, 2: Chessboard notation (inside board), 3: no notation, 
+// values for showNotation = 1: traditional notation, 2: ChessBoard notation (inside board), 3: no notation, 
 
 // Public ------------------------------------------------------------------------------
   return {
@@ -450,6 +463,7 @@ var ChessDiagram = new function() {
         if (options['pieceTheme'])    { pieceTheme    = options['pieceTheme']; };
         if (options['imgPath'])       { imgPath       = options['imgPath']; };
         if (options['notationStyle']) { notationStyle = options['notationStyle']; };
+        if (options['divStyle'])      { divStyle      = options['divStyle']; };
       };
       var bd = boards.length;
       if (!header) { header = ''; };
@@ -501,7 +515,9 @@ var ChessDiagram = new function() {
            '&nbsp;<img id="' + id + '_col" width="8" src="' + imgPath + fen.split(' ')[1] + '.png" />&nbsp;&nbsp;' +
            footer + '<br />';
       document.getElementById(id).innerHTML = html;
-
+      if (divStyle != '-') {
+        for (var key in divStyle) { document.getElementById(id).style[key] = divStyle[key]; };
+      };
       demoBoard.board =  new ChessBoard(id + '_board', {
                                         draggable:     true, 
                                         dropOffBoard:  'trash', 
