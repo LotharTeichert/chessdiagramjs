@@ -184,7 +184,7 @@ var ChessDiagram = new function() {
         if (((moveParts[2] == '') || 
              (moveParts[2] == String.fromCharCode('a'.charCodeAt(0) + fromPos % 9))) &&
             ((moveParts[3] == '') || 
-             (moveParts[3] == String.fromCharCode('8'.charCodeAt(0) + (fromPos - fromPos % 9)/9)))) {
+             (moveParts[3] == String.fromCharCode('8'.charCodeAt(0) - (fromPos - fromPos % 9)/9)))) {
 
 // Check legality (pins)
           auxBoard = board.substr(0, fromPos) + 'o' + board.substr(fromPos + 1, 80);
