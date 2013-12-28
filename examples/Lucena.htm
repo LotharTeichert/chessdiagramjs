@@ -3,28 +3,31 @@
  <title>Lucena Position</title>
  <link rel="stylesheet" href="../css/chessboard-0.3.0.css" />
  <script type="text/javascript" src="../js/json3.js"></script>
- <script type="text/javascript" src="../js/jquery-2.0.3.js"></script>
+ <script type="text/javascript" src="../js/jquery-2.0.3.min.js"></script>
  <script type="text/javascript" src="../js/chessboard-0.3.0.js"></script>
  <script type="text/javascript" src="../js/chessdiagram.js"></script>
 </head>
-<body><div style="font-family:Calibri;font-size:12pt;width:800px">
+<body><div style="font-family:Calibri;font-size:12pt">
 The following text is copied from Wikipedia, "Lucena position", on 20.12.2013. 
 I want to demonstrate the comfort of living chess diagrams as opposed to
 the usual pictures. You may follow the indicated moves by using the buttons
 below the diagrams, and you can try your own moves (may be illegal) by dragging pieces around.
 (What is not obvious: if you drop a pawn to its last rank, it is automatically 
-promoted to a queen, but you can drag it offboard to get another piece.)
-<p>
-It doesn't work in all browsers! I checked IE 11 (ok), IE 9 (not ok), Firefox 26 (ok).
+promoted to a queen, but you can drag it offboard to get another piece.) 
 <h3>Introduction</h3>
 <hr /> 
-<div id="diag01" style="float:right;margin:0 8;width:290px;background-color:#e0e0e0"></div>
+<div id="diag01"></div>
 <script>
 ChessDiagram.diagram('diag01', '1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1',
 '1. Rd1+ Ke7 2. Kc7  ' +
 '2... Rc2+ 3. Kb6 Rb2+ 4. Ka7 Ra2+ 5. Kb8 ',
 '<b>Lucena position</b><br />',
-'');
+'',
+{ divStyle: { backgroundColor:'#e0e0e0', 
+              width:'290px', 
+              styleFloat:'right', cssFloat:'right', 
+              margin:'8px', 
+              padding:'4px' }} );
 </script>
 <p>
 The Lucena position is named after the Spaniard Luis Ramírez de Lucena, 
@@ -32,8 +35,8 @@ although it is something of a misnomer, because the position does not in
 fact appear in his book on chess, <i>Repetición de Amores e Arte de Axedrez</i> (1497). 
 It does appear, however, in Alessandro Salvio's <i>Il Puttino</i> (1634), 
 a romance on the career of the chess player Leonardo da Cutri, 
-and it is in that form that it is given here (Müller &amp; Lamprecht 2001:179).[1] 
-Salvio attributes it to Scipione Genovino (Hooper &amp; Whyld 1992:238).
+and it is in that form that it is given here (Müller & Lamprecht 2001:179).[1] 
+Salvio attributes it to Scipione Genovino (Hooper & Whyld 1992:238).
 </p><p> 
 The position is shown above and below (the position can be moved as a whole or 
 mirrored so that the pawn is on any of the files b through g). White's aim is 
@@ -65,7 +68,7 @@ gets nowhere. Black can simply harass the white king with checks, and White make
 In the Lucena position, the side with the pawn has a winning method 
 that works for any pawn except a rook pawn (i.e. on the a- 
 or h-file). In some circumstances, it also works for a rook pawn.
-<div id="diag02" style="float:right;margin:0 8;width:290px;background-color:#e0e0e0"></div>
+<div id="diag02"></div>
 <script>
 ChessDiagram.diagram('diag02', '1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1',
 '1. Rd1+ Ke7 2. Rd4!  Ra1 ' +
@@ -91,9 +94,9 @@ variation, White continues
 The black rook can no longer check the white king and Black cannot 
 prevent the pawn from queening (Ward 2004:48). White's shielding 
 his king and pawn with the rook in this way was described as 
-"building a bridge" by Aron Nimzowitsch (Hooper &amp; Whyld 1992:238).
+"building a bridge" by Aron Nimzowitsch (Hooper & Whyld 1992:238).
 </p><p style="clear:right">
-<div id="diag03" style="float:right;margin:0 8;width:290px;background-color:#e0e0e0"></div>
+<div id="diag03"></div>
 <script>
 ChessDiagram.diagram('diag03', '8/1P2k3/1K6/8/3R4/8/8/1r6 w - - 0 5',
 '5. Kc6 Ke6 6. Rd6+ Ke7 7. Rd5! Rc1+ 8. Kb6 Rb1+ 9. Rb5 ',
@@ -135,7 +138,7 @@ rook to the crucial rank (i.e. 2.Rd4), see Rook and pawn
 versus_rook endgame#Defending rook prevents the bridge.
  </p><p>
 <h3>Black to move</h3>
-<div id="diag04" style="float:right;margin:0 8;width:290px;background-color:#e0e0e0"></div>
+<div id="diag04"></div>
 <script>
 ChessDiagram.diagram('diag04', '1K1k4/1P6/8/8/8/8/r7/2R5 b - - 0 1',
 '1... Ra4 2. Rd1+ Ke7 3. Kc7 Rc4+ 4. Kb6 Rb4+ 5. Ka6 Rb2 6. Rd5',
@@ -159,8 +162,7 @@ followed by
  <b>7. Rb5</b> (Emms 2008:17) (position reflected). 
 </p><p style="clear:right">
 <h3>Bridge on the fifth rank</h3>
-</p><p>
-<div id="diag05" style="float:right;margin:0 8;width:290px;background-color:#e0e0e0"></div>
+<div id="diag05"></div>
 <script>
 ChessDiagram.diagram('diag05', '3K4/3P2k1/8/8/8/8/2r5/5R2 w - - 0 1',
 '1. Rf5 Rc1 2. Ke7 Re1+ 3. Kd6 Rd1+ 4. Rd5',
@@ -194,7 +196,7 @@ and White has a winning (but difficult) queen versus rook endgame
  </p><p style="clear:right">
 <h3>Alternate plan for the defense</h3>
 <hr />
-<div id="diag06" style="float:right;margin:0 8;width:290px;background-color:#e0e0e0"></div>
+<div id="diag06"></div>
 <script>
 ChessDiagram.diagram('diag06', '1K6/1P2k3/8/8/3R4/8/r7/8 b - - 0 1',
 '2... Rb2 3. Ra4 Kd7 4. Ka8 Kc7 5. Rc4+',
@@ -217,7 +219,7 @@ which chases the black king away and allows the pawn to promote.
 </p><p style="clear:right"> 
 <h3>Rook pawn</h3>
  <hr />
-<div id="diag07" style="float:right;margin:0 8;width:290px;background-color:#e0e0e0"></div>
+<div id="diag07"></div>
 <script>
 ChessDiagram.diagram('diag07', 'K7/P4k2/8/8/8/8/1r6/4R3 w - - 0 1',
 ' 1. Rc1 Ke7 2. Rc8 Kd6! 3. Rb8 Ra2 4. Kb7 Rb2+ 5. Kc8 Rc2+ 6. Kd8 ' + 
@@ -242,7 +244,7 @@ to win than one where the rook is close to its king
 </p><p style="clear:right"> 
 <h3>Similar positions may be drawn</h3>
  <hr />
-<div id="diag08" style="float:right;margin:0 8;width:290px;background-color:#e0e0e0"></div>
+<div id="diag08"></div>
 <script>
 ChessDiagram.diagram('diag08', '4K2/4P1k1/8/8/8/8/r7/5R2 b - - 0 1',
 '',
@@ -263,7 +265,7 @@ versus rook endgame for more details.)
 <h3>Examples from praxis</h3>
 <hr />
  <h4>Rice versus Snape</h4> 
-<div id="diag09" style="float:right;margin:0 8;width:290px;background-color:#e0e0e0"></div>
+<div id="diag09"></div>
 <script>
 ChessDiagram.diagram('diag09', '8/5r2/6R1/8/8/8/4K1p1/6k1 b - - 0 81',
 '81... Re7+ 82. Kd2 Re5! 83. Rg8 Kf2 84. Rf8+ Kg3 85. Rg8+ Kf3 86. Kd1 Re4',
@@ -287,7 +289,7 @@ White resigns, but the alternative is:
 and Black wins (Snape 2003:36).
 </p><p style="clear:right">
  <h4>Andersson versus Åkesson</h4> 
-<div id="diag10" style="float:right;margin:0 8;width:290px;background-color:#e0e0e0"></div>
+<div id="diag10"></div>
 <script>
 ChessDiagram.diagram('diag10', '8/8/3k1K2/3pRP2/8/4P3/8/5r2 w - - 0 79',
 '79. e4! dxe4 80. Rxe4 Kd7 81. Kg6 ' +

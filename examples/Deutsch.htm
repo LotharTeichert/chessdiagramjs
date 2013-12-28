@@ -1,0 +1,92 @@
+<html>
+<head>
+<title>Deutsch</title>
+</head>
+<body><div style="font-family:Calibri;font-size:12pt">
+<h3>Lebendige Schachdiagramme</h3>
+<p>
+Das Lesen von Schachartikeln ist für mich mühsam, weil ich sehr viel Konzentration aufbringen muss,
+um mir die Entwicklung auf dem Schachbrett vorzustellen. Am Computer ist Unterstützung dafür eigentlich 
+sehr einfach, es gibt genug Software, mit der man entsprechend aufbereitete Partien oder Aufgaben auf
+einem Schachbrett anzeigen kann. Auf der Suche danach im Internet bin ich auf <b>Chessboardjs</b> von <i>Chris Oakman</i>
+gestoßen, ein Javascript, das nach meinem Geschmack die beste Animation von Schachzügen ermöglicht.
+Für eine leichte Integration in Webseiten mit erläuternden Texten habe ich ein Javascript 
+<b>ChessDiagram</b> geschaffen, das darauf aufbaut.
+</p><p>
+Im Menü nebenan kann man zwei Beispielseiten aufrufen, bei der die Vorzüge ganz gut herauskommen. 
+Für beide Seiten habe ich den Text einer Wikipedia-Seite kopiert und die dort benutzten
+Diagramme durch lebendige ersetzt. Man kann die besprochenen Züge auf dem Brett ablaufen lassen und
+in jeder Situation auch selbst auf dem Brett andere Züge ausprobieren. 
+(Falls es dabei zur Bauernumwandlung kommt, gibt es einen einfachen Trick, um nicht in eine Dame umzuwandeln:
+man muss nur die neuerstellte Dame neben das Brett ziehen und bekommt dafür einen Springer, ... .)
+</p><p>
+<h4>Verwendung</h4>
+Zum Einbauen eines solchen Diagramms muss man im Kopfbereich der HTML-Seite ein Stylesheet angeben
+und vier Scriptdateien:
+<pre style="font-size:10pt">
+&lt;html>
+&lt;head>
+ &lt;title>Lucena Position</title>
+ &lt;link rel="stylesheet" href="../css/chessboard-0.3.0.css" />
+ &lt;script type="text/javascript" src="../js/json3.js"></script>
+ &lt;script type="text/javascript" src="../js/jquery-2.0.3.min.js"></script>
+ &lt;script type="text/javascript" src="../js/chessboard-0.3.0.js"></script>
+ &lt;script type="text/javascript" src="../js/chessdiagram.js"></script>
+&lt;/head>
+...
+</pre>
+Im Körper der Seite können danach solche Abschnitte stehen:
+<pre style="font-size:10pt">
+...
+&lt;div id="diag01">&lt;/div>
+&lt;script>
+ChessDiagram.diagram('diag01', 
+'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+'1. e2-e4 e7-e5 2. Sg1-f3 d7-d6 3. d2-d4 Lc8-g4?! 4. d4xe5 Lg4xf3 ' +
+' 5. Dd1xf3 d6xe5 6. Lf1-c4 Sg8-f6 7. Df3-b3 Dd8-e7 ' +
+'8. Sb1-c3 c7-c6 9. Lc1-g5  b7-b5? ',
+'Morphy – Karl von Braunschweig und Graf Isouard, Paris 1858&lt;br />',
+'',
+{ divStyle: { backgroundColor:'#e0e0e0', 
+              width:'290px', 
+              styleFloat:'left', cssFloat:'left', 
+              margin:'8px', 
+              padding:'4px' }} );
+&lt;/script>
+...
+</pre>
+Der Scriptbereich muss nicht unmittelbar auf das div-Element folgen, es könnten auch die Aufrufe für
+mehrere Diagramme auf der Seite am Ende gesammelt werden.
+</p><p>
+Die einzelnen Parameter von ChessDiagram.diagram sind:
+<ul>
+ <li>Die Id des div-Elementes, in dem das Schachbrett dargestellt wird.</li>
+ <li>Die Beschreibung der Schachposition als FEN-Zeichenkette (Erläuterungen dazu findet man bei Wikipedia).</li>
+ <li>Die zum Abspielen vorgesehene Zugfolge. Akzeptiert werden Züge in algebraischer Notation,
+  lang oder kurz, auf Deutsch oder Englisch (im Deutschen muss man aber auf das <i>B</i> für Bauer verzichten!),
+  eventuell mit eingestreuten Zugnummern und Fortsetzungspunkten. Diese Flexibilität soll es
+  einfach machen, ein Diagramm zu einem bestehenden Text zu erstellen.</li>
+ <li>Eine Überschrift für das Diagramm, könnte HTML-formatiert sein.</li>
+ <li>Eine Fußzeile für das Diagramm, könnte HTML-formatiert sein.</li>
+ <li>Zusätzliche Optionen (in geschweiften Klammern). Sie können auch einfach fehlen (ein Parameter weniger) und
+  gelten für alle nachfolgenden Aufrufe von ChessDiagram.diagram, bis wieder welche angegeben werden.
+  Möglich sind:
+  <ul>
+  <li> divStyle: zusätzliche Style-Angaben für das div-Element mit der vereinbarten Id. 
+   Nützlich, um an einer Stelle (beim ersten Aufruf von ChessDiagram.diagram) alle Diagramme zu formatieren.</li>
+  <li>showNotation: 1 (Voreinstelung) für die übliche Brettnotation, 
+    2 für die Notation von ChessBoard (im Inneren des Brettes), 3 für keine Notation</li>
+  <li>boardWidth: Größe des Brettes (die 8 x 8 Felder), Voreinstellung: '240px'</li>
+  <li>pieceTheme: Figurenstil von ChessBoard, Voreinstellung: chesspieces/wikipedia/{piece}.png im Grafikverzeichnis</li>
+  <li>imgPath: Pfad für die Grafikdateien. Muss nicht angegeben werden, wenn das Grafikverzeichnis img heisst
+   und im gleichen Verzeichnis liegt wie das Script-Verzeichnis</li>
+  <li>notationStyle: Styleangabe (Zeichenkette wie bei einer HTML-Style-Angabe) für die Tabelle, die das
+   Schachbrett umgibt. Diese Tabelle hat als erste und letzte Zeile bzw. Spalte die Brettnotation, so dass
+   dadurch also die Noation formatiert wird. Voreinstellung: 
+'background-color:#f0f0f0;font-family:Lucida Console;font-size:12px;line-height:200%'
+</li>
+  </ul></li>
+</ul>
+</p>
+ </div></body>
+</html>

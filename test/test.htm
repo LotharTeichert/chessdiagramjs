@@ -1,0 +1,67 @@
+<html>
+<head>
+ <title>Testing chessdiagram.js</title>
+ <link rel="stylesheet" href="../css/chessboard-0.3.0.css" />
+ <script type="text/javascript" src="../js/json3.js"></script>
+ <script type="text/javascript" src="../js/jquery-2.0.3.min.js"></script>
+ <script type="text/javascript" src="../js/chessboard-0.3.0.js"></script>
+ <script type="text/javascript" src="../js/chessdiagram.js"></script>
+</head>
+<body><div style="font-family:Calibri;font-size:12pt;width:800px">
+Setup a position and enter a move. Click Test to get the diagram below 
+updated and check wether the correct move is done. 
+If the move is ambiguous a legal one should be selected.<br />
+<div style="width:300px" id="diag"></div>
+<input type="button" id="startBtn" value="Start" />
+<input type="button" id="clearBtn" value="Clear" />
+<script>
+var board = new ChessBoard('diag', {
+  draggable: true,
+  dropOffBoard: 'trash',
+  sparePieces: true,
+  pieceTheme: '../img/chesspieces/wikipedia/{piece}.png'
+});
+$('#startBtn').on('click', board.start);
+$('#clearBtn').on('click', board.clear);
+</script>
+<br /><br />
+<input type="text" size="100" id="moves" /><br />
+<input type="checkbox" id="player" />White to play, e.p.:<input type="text" id="ep" size="3" />
+<input type="button" value="Test" onclick="test()" /><br />
+<div id="diag1" style="width:300px"></div>
+<script>
+var query = decodeURI(location.search);
+var fen = '8/8/8/8/8/8/8/8';
+var moves = '';
+var player = 'w';
+var ep = '-';
+var qu;
+if (query.charAt(0) == '?') {
+  query = query.substr(1, query.length-1).split('&');
+  for (var i=0;i<query.length;i++) {
+    qu = query[i].split('=');
+    if (qu[0]=='fen') { fen = qu[1]; };
+    if (qu[0]=='moves') { moves = qu[1]; };
+    if (qu[0]=='player') { player = qu[1]; };
+    if (qu[0]=='ep') { ep = qu[1]; };
+  };
+};
+board.position(fen);
+document.getElementById('moves').value = moves;
+document.getElementById('ep').value = ep;
+document.getElementById('player').checked = (player=='w');
+ChessDiagram.diagram('diag1',
+fen + ' ' + player +' - ' + ep + ' 0 1',
+moves,
+moves,
+'ep: '+ ep);
+function test() {
+   var fen=board.fen();
+   location.href = encodeURI(location.href.replace(/\?.*/, '')+ '?fen=' + fen +
+                   '&moves=' + document.getElementById('moves').value +
+                   '&player=' + ((document.getElementById('player').checked) ? 'w' : 'b') +
+                   '&ep=' + document.getElementById('ep').value);
+};
+</script>
+</div></body>
+</html>
