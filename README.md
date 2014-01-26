@@ -26,14 +26,16 @@ ChessDiagram.diagram('diag02',
 </script>
 ...
 ```
-This will show a chessboard with three buttons to play back and forth in the provided move list.
+This will show a chessboard with three buttons to play back and forth in the provided move list and an
+additional button to display (and hide) the move list itself below the board with click sensitive moves. Clicking in the move list will show the move animated on the board and switch the line scope to the selected variation (yes, "recursive annotation variations" are supported!). The language for the move list on input and output can be different.
+
 At any point you may make your own moves on the board by dragging pieces around to check other variations.
 See ["Lucena.htm"](http://www.lteichert.de/chessdiagramjs/examples/index.htm) for an explanation of a chess endgame that I copied from wikipedia. I replaced all the pictures by "living" diagrams and think it's less cumbersome to read.
 
 The only method of the generated object **ChessDiagram** that you have to know is **ChessDiagram.diagram**. It takes 5 or 6 parameters:
 * The id of a div tag on the web page (where the board is placed).
 * The description of the initial position as a FEN string.
-* A list of moves in algebraic notation, long or short, English or German, move numbers and move decorations allowed (basically a copy of the explaining text on the web page).
+* A list of moves in algebraic notation, long or short, English by default (other languages by giving the option "languageIn"), move numbers and move decorations allowed (basically a copy of the explaining text on the web page).
 * Some header string.
 * Some footer string.
 * Optional: an object of options overriding default values.
@@ -50,6 +52,8 @@ The options object may contain:
 * *imgPath* (default is a guess from the html script tag assuming the img directory is a sibling of the script directory): give the path to the immages explicitly, if the guess is wrong.
 * *pieceTheme* (default is the guessed *imgPath* + 'chesspieces/wikipedia/{piece}.png'): the pieceTheme of chessboardjs. 
 * *divStyle*: An object whose attributes are added to or override the style attributes of the associated div tag. A handy method to format all diagrams on a page in one place (on the first call to ChessDiagram.chessdiagram). Default is an empty object.
+* *languageIn*: The language used for piece names in the given move list, "English" by default, may be chosen among "Czech", "Danish", "Dutch", "English", "Estonian", "Finnish", "French", "German", "Hungarian", "Icelandic", "Italian", "Norwegian", "Polish", "Portuguese", "Romanian", "Spanish", "Swedish". The intention is to support authors who copy and past the moves from existing documents.
+* *languageOut*: The language used for piece names in the move list when displayed for navigation below the board, "English" by default, same choices as for languageIn.
  
 If you call ChessDiagram.diagram with options present, the new options will hold until they are again overridden by a call to ChessDiagram.diagram with options present.
 
@@ -57,7 +61,7 @@ If you call ChessDiagram.diagram with options present, the new options will hold
 ## Code Highlights
 The function "makeMove(fen, move)" is the heart of ChessDiagram. It takes a FEN string (Forsyth Edwards notation, an easy standard description of a chess position) and a move string in algebraic notation (see the example above) and computes the FEN string of the resulting position. This is done by some complex applications of the RegExp object in javascript, without fiddling around with internal board representations.
 
-## ToDo
-* Checking more browsers for correct functionality.
-* More features?
-* Convincing the guys from wikipedia to use these diagrams instead of pictures.  :))
+## New in Version 2.0
+* Language support (but no more English/German simultaniously).
+* Support for nested variations.
+* Display of move list below the board for navigation.
