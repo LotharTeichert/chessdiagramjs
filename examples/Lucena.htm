@@ -72,7 +72,7 @@ or h-file). In some circumstances, it also works for a rook pawn.
 <script>
 ChessDiagram.diagram('diag02', '1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1',
 '1. Rd1+ Ke7 2. Rd4!  Ra1 ' +
-'3. Kc7 Rc1+ 4. Kb6 Rb1+ 5. Kc6 Rc1+ 6. Kb5 Rb1+ 7. Rb4!',
+'3. Kc7 Rc1+ 4. Kb6 Rb1+ 5. Kc6 (5. Ka6 Ra1+) Rc1+ 6. Kb5 Rb1+ 7. Rb4!',
 '<b>The Lucena position</b><br />',
 'White wins');
 </script>
@@ -88,7 +88,7 @@ hoping to harass the white king with checks again as in the above
 variation, White continues
 </p><p>
  <b>3. Kc7 Rc1+ 4. Kb6 Rb1+ 5. Kc6 Rc1+</b> 
-(Or 5.Ka6 Ra1+.)
+(Or 5. Ka6 Ra1+.)
  <b>6. Kb5 Rb1+ 7. Rb4!</b> 
 </p><p>
 The black rook can no longer check the white king and Black cannot 
@@ -99,7 +99,8 @@ his king and pawn with the rook in this way was described as
 <div id="diag03"></div>
 <script>
 ChessDiagram.diagram('diag03', '8/1P2k3/1K6/8/3R4/8/8/1r6 w - - 0 5',
-'5. Kc6 Ke6 6. Rd6+ Ke7 7. Rd5! Rc1+ 8. Kb6 Rb1+ 9. Rb5 ',
+'5. Kc6 Ke6 6. Rd6+ (6.Rd5?? (6. Re4+ Kf6 (6... Kf7 8. Re5) 7. Re8) ' +
+'Rxb7!) Ke7 7. Rd5! Rc1+ 8. Kb6 Rb1+ 9. Rb5 ',
 '<b>The Lucena position</b><br />',
 'White wins');
 </script>
@@ -116,11 +117,11 @@ if Black moves
  <b>5... Ke6 </b>
 </p><p>
 there is a trap for White: if 6.Rd5?? (to build a bridge on the 
-fifth rank) then 6...Rxb7! draws. However, if
+fifth rank) then 6... Rxb7! draws. However, if
 </p><p>
  <b>6. Rd6+ </b>
 </p><p>
-(6.Re4+ followed by either 7.Re8 or (if 7...Kf7) 8.Re5 works as 
+(6. Re4+ followed by either 7. Re8 or (if 7... Kf7) 8.Re5 works as 
 well.)
 </p><p>
  <b>6... Ke7 7. Rd5! </b>
@@ -141,7 +142,7 @@ versus_rook endgame#Defending rook prevents the bridge.
 <div id="diag04"></div>
 <script>
 ChessDiagram.diagram('diag04', '1K1k4/1P6/8/8/8/8/r7/2R5 b - - 0 1',
-'1... Ra4 2. Rd1+ Ke7 3. Kc7 Rc4+ 4. Kb6 Rb4+ 5. Ka6 Rb2 6. Rd5',
+'1... Ra4 2. Rd1+ Ke7 3. Kc7 Rc4+ 4. Kb6 Rb4+ 5. Ka6 Rb2 (5... Ra4+ 6. Kb5) 6. Rd5',
 '<b>from Emms</b><br />',
 'White wins');
 </script>
@@ -152,7 +153,7 @@ white rook from going to the fourth rank, but then White still wins:
 <b> 1... Ra4 2. Rd1+ Ke7 3. Kc7 Rc4+ 4. Kb6 Rb4+ 5. Ka6 Rb2 </b>
 </p><p>
 (The black rook is not far enough away to keep checking: if 
-5...Ra4+ then 6.Kb5 wins.) Now White wins by blocking the checks 
+5... Ra4+ then 6. Kb5 wins.) Now White wins by blocking the checks 
 with
 </p><p>
 <b> 6. Rd5</b>
@@ -165,7 +166,8 @@ followed by
 <div id="diag05"></div>
 <script>
 ChessDiagram.diagram('diag05', '3K4/3P2k1/8/8/8/8/2r5/5R2 w - - 0 1',
-'1. Rf5 Rc1 2. Ke7 Re1+ 3. Kd6 Rd1+ 4. Rd5',
+'1. Rf5 (1. Rf4!) Rc1 (1... Kg6 2. Ke7?! (2.Rf8 Kg7 3.Rf4!) ' +
+'Kxf5! 3. d8=Q) 2. Ke7 Re1+ 3. Kd6 Rd1+ 4. Rd5',
 '<b>from de la Villa</b><br />',
 'White to move makes a bridge on the fifth rank instead of the fourth rank.');
 </script>
@@ -199,7 +201,7 @@ and White has a winning (but difficult) queen versus rook endgame
 <div id="diag06"></div>
 <script>
 ChessDiagram.diagram('diag06', '1K6/1P2k3/8/8/3R4/8/r7/8 b - - 0 1',
-'2... Rb2 3. Ra4 Kd7 4. Ka8 Kc7 5. Rc4+',
+'2... Rb2 3. Ra4 Kd7 4. Ka8 (4. Ka7 Kc7 5.b8=Q+ Rxb8 6.Rc4+) Kc7 5. Rc4+',
 '<b>from de la Villa</b><br />',
 'Alternate plan for Black');
 </script>
@@ -268,7 +270,8 @@ versus rook endgame for more details.)
 <div id="diag09"></div>
 <script>
 ChessDiagram.diagram('diag09', '8/5r2/6R1/8/8/8/4K1p1/6k1 b - - 0 81',
-'81... Re7+ 82. Kd2 Re5! 83. Rg8 Kf2 84. Rf8+ Kg3 85. Rg8+ Kf3 86. Kd1 Re4',
+'81... Re7+ 82. Kd2 Re5! 83. Rg8 Kf2 84. Rf8+ Kg3 85. Rg8+ Kf3 86. Kd1 ' +
+'(86. Rf8+ Kg4 87. Rg8+ Rg5) Re4',
 '<b>Rice vs. Snape, 2000</b><br />',
 'Black to move wins using the Lucena position');
 </script>
@@ -294,7 +297,7 @@ and Black wins (Snape 2003:36).
 ChessDiagram.diagram('diag10', '8/8/3k1K2/3pRP2/8/4P3/8/5r2 w - - 0 79',
 '79. e4! dxe4 80. Rxe4 Kd7 81. Kg6 ' +
 '81...Rg1+ 82.Kf7 Rf1 83.f6 Rf2 84.Kg7 Rg2+ 85.Kf8 Rf2 86.f7 Rg2 ' +
-'87.Rd4+ Kc7 88.Ke7 Re2+ 89. Kf6 Rf2+ 90.Ke6 Re2+ 91.Kf5 Rf2+ 92.Rf4',
+'87.Rd4+ Kc7 (87... Ke6 88.Ke8)88.Ke7 Re2+ 89. Kf6 Rf2+ 90.Ke6 Re2+ 91.Kf5 Rf2+ 92.Rf4',
 '<b>Andersson vs. Åkesson, 1999</b><br />',
 'White to move wins');
 </script>
@@ -307,7 +310,7 @@ position.[3]
 </p><p>
 and Black resigned. White will reach a Lucena position: 81...Rg1+ 
 82.Kf7 Rf1 83.f6 Rf2 84.Kg7 Rg2+ 85.Kf8 Rf2 86.f7 Rg2 (a Lucena 
-position) 87.Rd4+ Kc7 (if 87...Ke6 then 88.Ke8 wins) 88.Ke7 Re2+ 
+position) 87.Rd4+ Kc7 (if 87... Ke6 then 88. Ke8 wins) 88.Ke7 Re2+ 
 89. Kf6 Rf2+ 90.Ke6 Re2+ 91.Kf5 Rf2+ 92.Rf4 and White wins (Kaufeld 
 &amp; Kern 2011:189).
  </p><p style="clear:right">
