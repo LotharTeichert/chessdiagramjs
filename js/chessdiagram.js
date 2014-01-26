@@ -249,9 +249,9 @@ var ChessDiagram = new function() {
         if (moveParts[1] != '') {
 // Disambigator given
           fromPos = destPos + ((sideToMove == 'w') ? 9 : -9) + 
-                    (moveParts[1] < moveParts[3]) ? -1 : 1;
+                    ((moveParts[1] < moveParts[3]) ? -1 : 1);
         } else {
-          fromPos = destPos + (sideToMove == 'w') ? 8 : -10;
+          fromPos = destPos + ((sideToMove == 'w') ? 8 : -10);
           if (board.charAt(fromPos) == piece) {
 // Check legality (pins)
             auxBoard = board.substr(0, fromPos) + 'o' + board.substr(fromPos + 1, 80);
