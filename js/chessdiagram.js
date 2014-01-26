@@ -39,17 +39,17 @@ var ChessDiagram = new function() {
   b: [/k1*o1*[RQ]/, /k(?:.{8}1)*.{8}o(?:.{8}1)*.{8}[RQ]/, /k(?:.{7}1)*.{7}o(?:.{7}1)*.{7}[BQ]/, /k(?:.{9}1)*.{9}o(?:.{9}1)*.{9}[BQ]/,
       /[RQ]1*o1*k/, /[RQ](?:.{8}1)*.{8}o(?:.{8}1)*.{8}k/, /[BQ](?:.{7}1)*.{7}o(?:.{7}1)*.{7}k/, /[BQ](?:.{9}1)*.{9}o(?:.{9}1)*.{9}k/]
   };
-  var castlingPattern = /^(?:\d)*(?:\.)*[O0]-[O0](-[O0])?/;
-  var pieceMovePattern = /^(?:\d)*(?:\.)*([KDTLSQRBN])([a-h]?)([1-8]?)[-x:]?([a-h])([1-8])/;
-  var pawnMovePattern = /^(?:\d)*(?:\.)*(?:[BP])?([a-h]?)([1-8]?)[-x:]?([a-h])([1-8]?)[x:]?=?([DTLSQBRN]?) ?(e\.?p)?/;
+  var castlingPattern = /^(?:\d)*(?:\.)*O-O(-O)?/;
+  var pieceMovePattern = /^(?:\d)*(?:\.)*([KQRBN])([a-h]?)([1-8]?)[-x:]?([a-h])([1-8])/;
+  var pawnMovePattern = /^(?:\d)*(?:\.)*(?:P)?([a-h]?)([1-8]?)[-x:]?([a-h])([1-8]?)[x:]?=?([QBRN]?) ?(e\.?p)?/;
 
   var boards = [];
 // This is a list of all diagrams on the page.
 // Elements of "boards" are objects with
-//   history:       array of fen strings
-//   moves:         array of move strings
+//   fens:          tree of fen strings
+//   moves:         tree of move strings
 //   board:         instance of ChessBoard
-//   movePtr:       number of moves executed in the diagram
+//   movePtr:       array of numbers indicating the diagram position in the move/fen-tree
 //   id:            HTML-Id of DIV-tag to be used
 //   dragPromotion: target + piece if a promotion takes place by dragging
 
@@ -117,7 +117,7 @@ var ChessDiagram = new function() {
            ((castle == '') ? '-' : castle) + ' ' +
            ((ep.charAt(0) == '*') ? ep.substr(1, 2) : '-') + ' ' +
            ((halfMoves == '*') ? '0' : parseInt(halfMoves) + 1) + ' ' +
-           ((sideToMove=='w') ? moveCount : parseInt(moveCount) + 1);
+           ((sideToMove=='w') ? moveCount : (parseInt(moveCount) + 1));
   };
 
   function handleCastling() {
@@ -158,12 +158,6 @@ var ChessDiagram = new function() {
     destPos = moveParts[4].charCodeAt(0) - 'a'.charCodeAt(0) + 
                   9 * ('8'.charCodeAt(0) - moveParts[5].charCodeAt(0));
     pieceOnDestination = board.charAt(destPos);
-
-// Translate from German
-    if (piece=='D') { piece = 'Q'; }
-    else if (piece=='T') { piece = 'R'; }
-    else if (piece=='L') { piece = 'B'; }
-    else if (piece=='S') { piece = 'N'; };
 
     if (sideToMove=='b') { piece = piece.toLowerCase(); };
 
@@ -359,12 +353,6 @@ var ChessDiagram = new function() {
 // Promotion?
     if (moveParts[5] != '') {
       piece = moveParts[5];
-// Translate from German
-      if (piece=='D') { piece = 'Q'; }
-      else if (piece=='T') { piece = 'R'; }
-      else if (piece=='L') { piece = 'B'; }
-      else if (piece=='S') { piece = 'N'; };
-
       if (sideToMove=='b') { piece = piece.toLowerCase(); };
     };
     board = board.substr(0, fromPos) + '1' + board.substr(fromPos + 1, 71);
@@ -412,41 +400,217 @@ var ChessDiagram = new function() {
   var imgPath = path.split('/').slice(0, -2).join('/') + '/img/'; // remove last filename parts and add directory name
   var pieceTheme = imgPath + 'chesspieces/wikipedia/{piece}.png';
 
+  var languageIn = "English";
+  var languageOut = "English";
   var divStyle = '-';
   var notationStyle = 'background-color:#f0f0f0;font-family:Lucida Console;font-size:12px;line-height:200%';
   var boardWidth = '240px';
   var showNotation = 1;
 // values for showNotation = 1: traditional notation, 2: ChessBoard notation (inside board), 3: no notation, 
 
+  function initFens(fens, moves) {
+// Initialize the fens of the position before a move, for all moves of a line.
+// The first one is already given, we set it again for simplicity.
+    var oldFen, newFen;
+    newFen = fens[0];
+    for (var j = 0; j < moves.length; j++) {
+      if (typeof(moves[j])=='string') {
+        oldFen = newFen;
+        fens[j] = oldFen;
+        newFen = makeMove(oldFen, moves[j]);
+      } else {
+        fens[j] = [oldFen];
+      };
+    };
+  };
+  function moveTree(moves, prefix, m, p) {
+// generate a string of spans for each move
+    var s = '';
+    var moveOut;
+    for (var i = 0; i < moves.length; i++) {
+      if (typeof(moves[i]) == 'string') {
+/* output language support
+Czech      P J S V D K 
+Danish     B S L T D K 
+Dutch      O P L T D K 
+English    P N B R Q K   default + internal
+Estonian   P R O V L K 
+Finnish    P R L T D K 
+French     P C F T D R 
+German     B S L T D K 
+Hungarian  G H F B V K 
+Icelandic  P R B H D K 
+Italian    P C A T D R 
+Norwegian  B S L T D K 
+Polish     P S G W H K 
+Portuguese P C B T D R 
+Romanian   P C N T D R 
+Spanish    P C A T D R 
+Swedish    B S L T D K 
+*/
+        moveOut = moves[i];
+        switch (languageOut) {
+        case "German":
+        case "Danish":
+        case "Norwegian":
+        case "Swedish":
+          moveOut = moveOut.replace(/N/g, 'S').replace(/B/g, 'L').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/P/g, 'B');
+          break;
+        case "Czech":
+          moveOut = moveOut.replace(/N/g, 'J').replace(/B/g, 'S').replace(/R/g, 'V').replace(/Q/g, 'D');
+          break;
+        case "Finnish":
+          moveOut = moveOut.replace(/B/g, 'L').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/N/g, 'R');
+          break;
+        case "French":
+          moveOut = moveOut.replace(/N/g, 'C').replace(/B/g, 'F').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/K/g, 'R');
+          break;
+        case "Hungarian":
+          moveOut = moveOut.replace(/N/g, 'H').replace(/B/g, 'F').replace(/R/g, 'B').replace(/Q/g, 'V').replace(/P/g, 'G');
+          break;
+        case "Icelandic":
+          moveOut = moveOut.replace(/R/g, 'H').replace(/Q/g, 'D').replace(/N/g, 'R');
+          break;
+        case "Italian":
+        case "Spanish":
+          moveOut = moveOut.replace(/N/g, 'C').replace(/B/g, 'A').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/K/g, 'R');
+          break;
+        case "Polish":
+          moveOut = moveOut.replace(/N/g, 'S').replace(/B/g, 'G').replace(/R/g, 'W').replace(/Q/g, 'H');
+          break;
+        case "Portuguese":
+          moveOut = moveOut.replace(/N/g, 'C').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/K/g, 'R');
+          break;
+        case "Romanian":
+          moveOut = moveOut.replace(/N/g, 'C').replace(/B/g, 'N').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/K/g, 'R');
+          break;
+        case "Dutch":
+          moveOut = moveOut.replace(/P/g, 'O').replace(/N/g, 'P').replace(/B/g, 'L').replace(/R/g, 'T').replace(/Q/g, 'D');
+          break;
+        case "Estonian":
+          moveOut = moveOut.replace(/B/g, 'O').replace(/R/g, 'V').replace(/Q/g, 'L').replace(/N/g, 'R');
+          break;
+        };
+        if (p == 'w') {
+          s += (' ' + m + '.' + prefix + i + '])">' + moveOut + '</span> ');
+          p = 'b';
+        } else {
+          if (i==0) {
+            s += (' ' + m + '...' + prefix + i + '])">' + moveOut + '</span> ');
+          } else {
+            s += (prefix + i + '])">' + moveOut + '</span> ');
+          };
+          m += 1;
+          p = 'w';
+        };
+      } else {
+        if (p == 'w') {
+          s += ('(' + moveTree(moves[i], prefix + i + ',', m-1, 'b') + ')');
+        } else {
+          s += ('(' + moveTree(moves[i], prefix + i + ',', m, 'w') + ')');
+        };
+      };
+    };
+    return s;
+  };
 // Public ------------------------------------------------------------------------------
   return {
 
-    show: function (b, pos) {
-// Show the diagram boards[b]
-//  in starting position (pos = 0),
-//  next position (pos > 0) or previous position (else).
+    togglePGN: function(b) {
+      if (boards[b].showPGN) {
+        document.getElementById(boards[b].id + '_pgn').style["display"] = "none";
+        boards[b].showPGN = false;
+      } else {
+        document.getElementById(boards[b].id + '_pgn').style["display"] = "inline";
+        boards[b].showPGN = true;
+      };
+    },
+
+    m: function(b, newMovePtr) {
+// b is the number of a diagram.
+// newMovePtr is an array to select a move in the move tree.
+// This move will be visualized and its line will become the
+// currently line of the diagram.
+// If necessary, missing fens will be initialized.
       var bd = boards[b];
+      var moves = bd.moves;
+      var fens = bd.fens;
+      var newFen, oldFen;
+      for (var i = 0; i < newMovePtr.length-1; i++) {
+        if (moves.length > fens.length) { 
+// this line has not been shown so far, so compute all fen strings.
+          initFens(fens, moves);
+        };
+        moves = moves[newMovePtr[i]];
+        fens = fens[newMovePtr[i]];
+      };
+      if (moves.length > fens.length) {
+        initFens(fens, moves);
+      };
+      var k = newMovePtr[newMovePtr.length-1];
+      bd.board.position(fens[k], false);
+      newFen = makeMove(fens[k], moves[k]);
+      bd.board.position(newFen, true);
+      bd.dragPromotion = '';
+      document.getElementById(bd.id + '_num').innerHTML = 
+        newFen.split(' ')[5] + '.';
+      document.getElementById(bd.id + '_col').src = 
+        imgPath + newFen.split(' ')[1] + '.png';
+      bd.lineMoves = moves;
+      bd.lineFens = fens;
+      bd.movePtr = k+1;
+      if (bd.movePtr < bd.lineMoves.length) {
+        if (typeof(bd.lineMoves[bd.movePtr]) != 'string') {
+          bd.movePtr += 1;
+        };
+      };
+    },
+
+    show: function (b, pos) {
+// Show the diagram boards[b] ...
+//  ... in starting position (pos = 0),
+//  next position (pos > 0) or previous position (else).
+// lineMoves[movePtr] is always a string!
+// if lineMoves[movePtr] is not a string then lineMoves[movePtr-1] is!
+      var newFen;
+      var bd = boards[b];
+      if (bd.lineFens.length < bd.lineMoves.length) {
+        initFens(bd.lineFens, bd.lineMoves);
+      };
       if (pos == 0) { 
         bd.movePtr = 0;
       } else if (pos > 0) {
-        if (bd.movePtr < bd.moves.length) {
-          if (bd.history.length <= bd.movePtr + 1) {
-            bd.history[bd.movePtr+1] = 
-              makeMove(bd.history[bd.movePtr], bd.moves[bd.movePtr]);
-          };
+        if (bd.movePtr < bd.lineMoves.length) {
           bd.movePtr += 1;
+          if (bd.movePtr < bd.lineMoves.length) {
+            if (typeof(bd.lineMoves[bd.movePtr]) != 'string') {
+              bd.movePtr += 1;
+            };
+          };
         };
       } else {
         if (bd.movePtr > 0) {
           bd.movePtr -= 1;
+          if (typeof(bd.lineMoves[bd.movePtr]) != 'string') {
+            bd.movePtr -= 1;
+          };
         };
       };
       bd.dragPromotion = '';
-      bd.board.position(bd.history[bd.movePtr]);
+      if (bd.movePtr < bd.lineMoves.length) {
+        newFen = bd.lineFens[bd.movePtr];
+      } else {
+        if (typeof(bd.lineMoves[bd.movePtr-1]) != 'string') {
+          newFen = makeMove(bd.lineFens[bd.movePtr-2], bd.lineMoves[bd.movePtr-2]);
+        } else {
+          newFen = makeMove(bd.lineFens[bd.movePtr-1], bd.lineMoves[bd.movePtr-1]);
+        };
+      };
+      bd.board.position(newFen);
       document.getElementById(bd.id + '_num').innerHTML = 
-        bd.history[bd.movePtr].split(' ')[5] + '.';
+        newFen.split(' ')[5] + '.';
       document.getElementById(bd.id + '_col').src = 
-        imgPath + bd.history[bd.movePtr].split(' ')[1] + '.png';
+        imgPath + newFen.split(' ')[1] + '.png';
     },
 
     diagram: function (id, fen, pgn, header, footer, options) {
@@ -458,6 +622,8 @@ var ChessDiagram = new function() {
 // until they are changed in another call to "diagram").
 
       if (options) {
+        if (options['languageIn'])    { languageIn    = options['languageIn']; };
+        if (options['languageOut'])   { languageOut   = options['languageOut']; };
         if (options['showNotation'])  { showNotation  = options['showNotation']; };
         if (options['boardWidth'])    { boardWidth    = options['boardWidth']; };
         if (options['pieceTheme'])    { pieceTheme    = options['pieceTheme']; };
@@ -470,18 +636,97 @@ var ChessDiagram = new function() {
       if (!footer) { footer = ''; };
       var demoBoard = {};
       boards[bd] = demoBoard;
-      demoBoard.history = [fen];
-      demoBoard.moves = [];
+      demoBoard.fens = [fen];
       demoBoard.id = id;
       demoBoard.dragPromotion = '';
-      var L = pgn.replace(/\s+/g, ' ').split(' ');
+
+// ensure all tokens are separated by white space
+      var L = pgn.replace(/([\(\)])/g, ' $1 ');
+/* input language support
+Czech      P J S V D K 
+Danish     B S L T D K 
+Dutch      O P L T D K 
+English    P N B R Q K   default + internal
+Estonian   P R O V L K 
+Finnish    P R L T D K 
+French     P C F T D R 
+German     B S L T D K 
+Hungarian  G H F B V K 
+Icelandic  P R B H D K 
+Italian    P C A T D R 
+Norwegian  B S L T D K 
+Polish     P S G W H K 
+Portuguese P C B T D R 
+Romanian   P C N T D R 
+Spanish    P C A T D R 
+Swedish    B S L T D K 
+*/
+      switch (languageIn) {
+        case "German":
+        case "Danish":
+        case "Norwegian":
+        case "Swedish":
+          L = L.replace(/B/g, 'P').replace(/S/g, 'N').replace(/L/g, 'B').replace(/T/g, 'R').replace(/D/g, 'Q');
+          break;
+        case "Czech":
+          L = L.replace(/J/g, 'N').replace(/S/g, 'B').replace(/V/g, 'R').replace(/D/g, 'Q');
+          break;
+        case "Finnish":
+          L = L.replace(/R/g, 'N').replace(/L/g, 'B').replace(/T/g, 'R').replace(/D/g, 'Q');
+          break;
+        case "French":
+          L = L.replace(/C/g, 'N').replace(/F/g, 'B').replace(/D/g, 'Q').replace(/R/g, 'K').replace(/T/g, 'R');
+          break;
+        case "Hungarian":
+          L = L.replace(/G/g, 'P').replace(/H/g, 'N').replace(/B/g, 'R').replace(/V/g, 'Q').replace(/F/g, 'B');
+          break;
+        case "Icelandic":
+          L = L.replace(/R/g, 'N').replace(/H/g, 'R').replace(/D/g, 'Q');
+          break;
+        case "Italian":
+        case "Spanish":
+          L = L.replace(/C/g, 'N').replace(/A/g, 'B').replace(/D/g, 'Q').replace(/R/g, 'K').replace(/T/g, 'R');
+          break;
+        case "Polish":
+          L = L.replace(/S/g, 'N').replace(/G/g, 'B').replace(/W/g, 'R').replace(/H/g, 'Q');
+          break;
+        case "Portuguese":
+          L = L.replace(/C/g, 'N').replace(/D/g, 'Q').replace(/R/g, 'K').replace(/T/g, 'R');
+          break;
+        case "Romanian":
+          L = L.replace(/N/g, 'B').replace(/D/g, 'Q').replace(/R/g, 'K').replace(/T/g, 'R').replace(/C/g, 'N');
+          break;
+        case "Dutch":
+          L = L.replace(/P/g, 'N').replace(/L/g, 'B').replace(/T/g, 'R').replace(/D/g, 'Q').replace(/O/g, 'P');
+          L = L.replace(/P-P-P/g, 'O-O-O').replace(/P-P/g, 'O-O');
+          break;
+        case "Estonian":
+          L = L.replace(/R/g, 'N').replace(/O/g, 'B').replace(/V/g, 'R').replace(/L/g, 'Q');
+          L = L.replace(/B-B-B/g, 'O-O-O').replace(/B-B/g, 'O-O');
+          break;
+      };
+      L = L.replace(/\s+/g, ' ').split(' ');
+// build move tree from PGN data
+      var moveList = [];
+      var height = 0;
+      var moves = [];
       for (var i=0;i<L.length;i++) {
-        if (castlingPattern.test(L[i]) ||
-            pieceMovePattern.test(L[i]) ||
-            pawnMovePattern.test(L[i])) {
-          demoBoard.moves[demoBoard.moves.length] = L[i];
+        L[i] = L[i].replace(/^\d*\.*/, '');
+        if (L[i]=='(') {
+          moves[moves.length] = [];
+          moveList[height] = moves;
+          moves = moves[moves.length-1];
+          height += 1;
+        } else if (L[i]==')') {
+          height -= 1;
+          moves = moveList[height];
+        } else if (castlingPattern.test(L[i]) ||
+                   pieceMovePattern.test(L[i]) ||
+                   pawnMovePattern.test(L[i])) {
+          moves[moves.length] = L[i];
         };
       };
+      demoBoard.moves = moves;
       var html;
       if (showNotation==1) {
         html = header + '<table border="0" cellpadding="0" cellspacing="0" align="center"' +
@@ -508,12 +753,18 @@ var ChessDiagram = new function() {
       if (demoBoard.moves.length > 0) {
         html = html +
            '<input type="button" onclick="ChessDiagram.show(' + bd + ', 1);" value=" &gt; " />' +
-           '<input type="button" onclick="ChessDiagram.show(' + bd + ',-1);" value=" &lt; " />';
+           '<input type="button" onclick="ChessDiagram.show(' + bd + ',-1);" value=" &lt; " />' +
+           '<input type="button" onclick="ChessDiagram.togglePGN(' + bd + ');" value=" + " />';
       };
       html = html +
            '&nbsp;<span id="' + id + '_num">' + fen.split(' ')[5] + '.</span>' +
            '&nbsp;<img id="' + id + '_col" width="8" src="' + imgPath + fen.split(' ')[1] + '.png" />&nbsp;&nbsp;' +
            footer + '<br />';
+// interactive move tree
+      html = html + '<span id="' + id + '_pgn" style="display:none">' +
+             moveTree(moves, ' <span onclick="ChessDiagram.m(' + bd + ',[',
+             parseInt(fen.split(' ')[5]), fen.split(' ')[1]) + 
+             '</span>';
       document.getElementById(id).innerHTML = html;
       if (divStyle != '-') {
         for (var key in divStyle) { document.getElementById(id).style[key] = divStyle[key]; };
@@ -530,6 +781,9 @@ var ChessDiagram = new function() {
                                         onSnapbackEnd: function() { onSnapEnd(bd); }
                                         } );
       demoBoard.movePtr = 0;
+      demoBoard.lineFens = demoBoard.fens;
+      demoBoard.lineMoves = demoBoard.moves;
+      demoBoard.showPGN = false;
     }
   };
 } () ;
