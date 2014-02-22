@@ -11,24 +11,13 @@
 The following text is copied from Wikipedia, "Lucena position", on 20.12.2013. 
 I want to demonstrate the comfort of living chess diagrams as opposed to
 the usual pictures. You may follow the indicated moves by using the buttons
-below the diagrams, and you can try your own moves (may be illegal) by dragging pieces around.
+below the diagrams or clicking on the move in the text, and you can try your own moves
+by dragging pieces around.
 (What is not obvious: if you drop a pawn to its last rank, it is automatically 
 promoted to a queen, but you can drag it offboard to get another piece.) 
 <h3>Introduction</h3>
 <hr /> 
 <div id="diag01"></div>
-<script>
-ChessDiagram.diagram('diag01', '1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1',
-'1. Rd1+ Ke7 2. Kc7  ' +
-'2... Rc2+ 3. Kb6 Rb2+ 4. Ka7 Ra2+ 5. Kb8 ',
-'<b>Lucena position</b><br />',
-'',
-{ divStyle: { backgroundColor:'#e0e0e0', 
-              width:'290px', 
-              styleFloat:'right', cssFloat:'right', 
-              margin:'8px', 
-              padding:'4px' }} );
-</script>
 <p>
 The Lucena position is named after the Spaniard Luis Ramírez de Lucena, 
 although it is something of a misnomer, because the position does not in 
@@ -55,194 +44,138 @@ The essential characteristics of the position are:
  <li>the attacking rook cuts off the opposing king from the pawn by at least one file</li>
  <li>the defending rook is on the file on the other side of the pawn</li>
 </ul>
-An obvious approach by White (in the position above) such as
-<p>
- <b>1. Rd1+ Ke7 2. Kc7 </b>
-</p><p>
-gets nowhere. Black can simply harass the white king with checks, and White makes no progress:
-</p><p>
- <b>2... Rc2+ 3. Kb6 Rb2+ 4. Ka7 Ra2+ 5. Kb8</b>
-</p><p>
+<div id="diag01_pgn"></div>
+<script>
+ChessDiagram.diagram('diag01', '1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1',
+'{An obvious approach by White (in the position above) such as}{} \
+1. Rd1+ Ke7 2. Kc7 {}\
+{gets nowhere. Black can simply harass the white king with checks, and White makes no progress:}{} \
+2... Rc2+ 3. Kb6 Rb2+ 4. Ka7 Ra2+ 5. Kb8',
+'<b>Lucena position</b><br />',
+'',
+{ divStyle: { backgroundColor:'#e0e0e0', 
+              width:'290px', 
+              styleFloat:'right', cssFloat:'right', 
+              margin:'8px', 
+              padding:'4px' }} );
+</script>
 <h3>The winning method: building a bridge</h3>
 <hr />
 In the Lucena position, the side with the pawn has a winning method 
 that works for any pawn except a rook pawn (i.e. on the a- 
 or h-file). In some circumstances, it also works for a rook pawn.
-<div id="diag02"></div>
+<div id="diag02"></div><div id="diag02_pgn"></div>
 <script>
 ChessDiagram.diagram('diag02', '1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1',
-'1. Rd1+ Ke7 2. Rd4!  Ra1 ' +
-'3. Kc7 Rc1+ 4. Kb6 Rb1+ 5. Kc6 (5. Ka6 Ra1+) Rc1+ 6. Kb5 Rb1+ 7. Rb4!',
+'{In this position, White can win with}{} \
+1. Rd1+ Ke7 2. Rd4! {} \
+{Now, if Black plays a waiting move, such as} {} \
+2... Ra1 {} \
+{hoping to harass the white king with checks again as in the above \
+variation, White continues} {} \
+3. Kc7 Rc1+ 4. Kb6 Rb1+ 5. Kc6 ({Or} 5. Ka6 Ra1+.) Rc1+ \
+6. Kb5 Rb1+ 7. Rb4! {}',
 '<b>The Lucena position</b><br />',
 'White wins');
 </script>
-In this position, White can win with
-<p>
- <b>1. Rd1+ Ke7 2. Rd4! </b>
-</p><p>
-Now, if Black plays a waiting move, such as
-</p><p>
- <b>2... Ra1</b> 
-</p><p>
-hoping to harass the white king with checks again as in the above 
-variation, White continues
-</p><p>
- <b>3. Kc7 Rc1+ 4. Kb6 Rb1+ 5. Kc6 Rc1+</b> 
-(Or 5. Ka6 Ra1+.)
- <b>6. Kb5 Rb1+ 7. Rb4!</b> 
-</p><p>
 The black rook can no longer check the white king and Black cannot 
 prevent the pawn from queening (Ward 2004:48). White's shielding 
 his king and pawn with the rook in this way was described as 
 "building a bridge" by Aron Nimzowitsch (Hooper & Whyld 1992:238).
 </p><p style="clear:right">
-<div id="diag03"></div>
+<div id="diag03"></div><div id="diag03_pgn"></div>
 <script>
 ChessDiagram.diagram('diag03', '8/1P2k3/1K6/8/3R4/8/8/1r6 w - - 0 5',
-'5. Kc6 Ke6 6. Rd6+ (6.Rd5?? (6. Re4+ Kf6 (6... Kf7 8. Re5) 7. Re8) ' +
-'Rxb7!) Ke7 7. Rd5! Rc1+ 8. Kb6 Rb1+ 9. Rb5 ',
+'{It is important that the white rook go initially to the fourth rank \
+if Black uses his most active defense: repeatedly checking the \
+white king. If Black abandons this defense, the white rook can \
+build a bridge on the fifth rank. In the line above, after}{} \
+5. Kc6 {} {if Black moves} {} \
+5... Ke6 {} \
+({there is a trap for White: if} Ke6 6.Rd5?? {(to build a bridge on the \
+fifth rank) then} 6... Rxb7! {draws.}) {} {However, if} {} \
+6. Rd6+ (6. Re4+ {followed by} Kf6 ({or} 7... Kf7 8.Re5) 7. Re8 {works as \
+well.}) 6... Ke7 7. Rd5! {} \
+{and White can build a bridge on the fifth rank by getting the rook \
+to b5, the king to b6, and then the pawn can promote \
+(Ward 2004:48–49) (position reflected):}{} \
+7... Rc1+ 8. Kb6 Rb1+ 9. Rb5 {} {and White wins.} {}',
 '<b>The Lucena position</b><br />',
 'White wins');
 </script>
-<p>
-It is important that the white rook go initially to the fourth rank 
-if Black uses his most active defense: repeatedly checking the 
-white king. If Black abandons this defense, the white rook can 
-build a bridge on the fifth rank. In the line above, after
-</p><p>
- <b>5. Kc6 </b>
-</p><p>
-if Black moves
-</p><p>
- <b>5... Ke6 </b>
-</p><p>
-there is a trap for White: if 6.Rd5?? (to build a bridge on the 
-fifth rank) then 6... Rxb7! draws. However, if
-</p><p>
- <b>6. Rd6+ </b>
-</p><p>
-(6. Re4+ followed by either 7. Re8 or (if 7... Kf7) 8.Re5 works as 
-well.)
-</p><p>
- <b>6... Ke7 7. Rd5! </b>
-</p><p>
-and White can build a bridge on the fifth rank by getting the rook 
-to b5, the king to b6, and then the pawn can promote 
-(Ward 2004:48–49) (position reflected):
-</p><p>
- <b>7... Rc1+ 8. Kb6 Rb1+ 9. Rb5 </b>
-</p><p>
-and White wins.
 </p><p style="clear:right">
 If the defending rook is on the rank that would prevent moving the 
 rook to the crucial rank (i.e. 2.Rd4), see Rook and pawn 
 versus_rook endgame#Defending rook prevents the bridge.
  </p><p>
 <h3>Black to move</h3>
-<div id="diag04"></div>
+<div id="diag04"></div><div id="diag04_pgn"></div>
 <script>
 ChessDiagram.diagram('diag04', '1K1k4/1P6/8/8/8/8/r7/2R5 b - - 0 1',
-'1... Ra4 2. Rd1+ Ke7 3. Kc7 Rc4+ 4. Kb6 Rb4+ 5. Ka6 Rb2 (5... Ra4+ 6. Kb5) 6. Rd5',
+'{If Black is to move in the diagrammed position, he can prevent the \
+white rook from going to the fourth rank, but then White still wins:}{} \
+1... Ra4 2. Rd1+ Ke7 3. Kc7 Rc4+ 4. Kb6 Rb4+ 5. Ka6 Rb2 {} \
+({The black rook is not far enough away to keep checking: if} \
+5... Ra4+ {then} 6. Kb5 {wins.}) {Now White wins by blocking the checks with}{} \
+6. Rd5 {} {followed by}{} - 7. Rb5 {(Emms 2008:17) (position reflected).}',
 '<b>from Emms</b><br />',
 'White wins');
 </script>
-<p>
-If Black is to move in the diagrammed position, he can prevent the 
-white rook from going to the fourth rank, but then White still wins:
-</p><p>
-<b> 1... Ra4 2. Rd1+ Ke7 3. Kc7 Rc4+ 4. Kb6 Rb4+ 5. Ka6 Rb2 </b>
-</p><p>
-(The black rook is not far enough away to keep checking: if 
-5... Ra4+ then 6. Kb5 wins.) Now White wins by blocking the checks 
-with
-</p><p>
-<b> 6. Rd5</b>
-</p><p> 
-followed by
-</p><p>
- <b>7. Rb5</b> (Emms 2008:17) (position reflected). 
 </p><p style="clear:right">
 <h3>Bridge on the fifth rank</h3>
-<div id="diag05"></div>
+A bridge can also be built on the fifth rank (but it is better to 
+build one on the fourth rank). 
+<div id="diag05"></div><div id="diag05_pgn"></div>
 <script>
 ChessDiagram.diagram('diag05', '3K4/3P2k1/8/8/8/8/2r5/5R2 w - - 0 1',
-'1. Rf5 (1. Rf4!) Rc1 (1... Kg6 2. Ke7?! (2.Rf8 Kg7 3.Rf4!) ' +
-'Kxf5! 3. d8=Q) 2. Ke7 Re1+ 3. Kd6 Rd1+ 4. Rd5',
+'{The main line goes:}{} 1. Rf5 ({Instead of} 1.Rf4!) 1... Rc1 \
+({Or} 1... Kg6 2. Ke7?! ({Better is} 2.Rf8 Kg7 3.Rf4!, \
+{back to a bridge on the fourth rank.}) \
+2... Kxf5! 3. d8=Q \
+{and White has a winning (but difficult) queen versus rook endgame \
+(see pawnless chess endgame) (de la Villa 2008:126–27).}) {} 2. Ke7 {} \
+{Threatening to promote the pawn, Black can just delay it with checks.} {} \
+2... Re1+ 3. Kd6 Rd1+ 4. Rd5 {} {and the pawn will promote.} \
+',
 '<b>from de la Villa</b><br />',
 'White to move makes a bridge on the fifth rank instead of the fourth rank.');
 </script>
 <p>
-A bridge can also be built on the fifth rank (but it is better to 
-build one on the fourth rank). The main line goes:
-</p><p>
-<b> 1. Rf5</b> 
-</p><p>
-(Instead of 1.Rf4!)
-</p><p>
- <b>1... Rc1 2. Ke7</b> 
-</p><p>
-Threatening to promote the pawn, Black can just delay it with checks.
-</p><p>
-<b> 2... Re1+ 3. Kd6 Rd1+ 4. Rd5</b>[2] 
-</p><p>
-and the pawn will promote. Or
-</p><p>
-<b> 1... Kg6 2. Ke7?!</b> 
-</p><p>
-Better is 2.Rf8 Kg7 3.Rf4!, back to a bridge on the fourth rank.
-</p><p>
-<b> 2... Kxf5! 3. d8=Q</b> 
-</p><p>
-and White has a winning (but difficult) queen versus rook endgame 
-(see pawnless chess endgame) (de la Villa 2008:126–27).
  </p><p style="clear:right">
 <h3>Alternate plan for the defense</h3>
 <hr />
-<div id="diag06"></div>
+<div id="diag06"></div><div id="diag06_pgn"></div>
 <script>
-ChessDiagram.diagram('diag06', '1K6/1P2k3/8/8/3R4/8/r7/8 b - - 0 1',
-'2... Rb2 3. Ra4 Kd7 4. Ka8 (4. Ka7 Kc7 5.b8=Q+ Rxb8 6.Rc4+) Kc7 5. Rc4+',
+ChessDiagram.diagram('diag06', '1K6/1P2k3/8/8/3R4/8/r7/8 b - - 0 2',
+'{Alternative approaches are no better for Black. After 1.Rd1+ Ke7 \
+2.Rd4 above, after} {} 2... Rb2 {} \
+{for example, White can still carry out his plan as above, or he can \
+win with the simple} {} 3. Ra4 Kd7 4. Ka7 ({or} 4.Ka8) Kc7 5. Rc4+ {} \
+{which chases the black king away and allows the pawn to promote. } \
+({Or,} 5.b8=Q+ Rxb8 6.Rc4+ {wins the rook.})',
 '<b>from de la Villa</b><br />',
 'Alternate plan for Black');
 </script>
-<p>
-Alternative approaches are no better for Black. After 1.Rd1+ Ke7 
-2.Rd4 above, after
-</p><p>
-<b> 2... Rb2 </b>
-</p><p>
-for example, White can still carry out his plan as above, or he can 
-win with the simple
-</p><p>
-<b> 3. Ra4 Kd7 4. Ka8 (or 4.Ka7) Kc7 5. Rc4+ </b>
-</p><p>
-which chases the black king away and allows the pawn to promote. 
-(Or, 5.b8=Q+ Rxb8 6.Rc4+ wins the rook.)
 </p><p style="clear:right"> 
 <h3>Rook pawn</h3>
  <hr />
-<div id="diag07"></div>
+<div id="diag07"></div><div id="diag07_pgn"></div>
 <script>
 ChessDiagram.diagram('diag07', 'K7/P4k2/8/8/8/8/1r6/4R3 w - - 0 1',
-' 1. Rc1 Ke7 2. Rc8 Kd6! 3. Rb8 Ra2 4. Kb7 Rb2+ 5. Kc8 Rc2+ 6. Kd8 ' + 
-'Rh2! 7. Rb6+ Kc5 8. Rc6+! Kxc6 9. a8=Q+',
+'{The Lucena method also works with a rook pawn if the white rook is \
+already on the fourth rank, the black rook is not on the file \
+adjacent to the pawn, and White is to move. Otherwise, the \
+defending king must be cut off four files from the pawn, as in the \
+diagram. This is not a true Lucena position since the king is cut \
+off by more than one file. White wins:}{} \
+1. Rc1 Ke7 2. Rc8 Kd6! 3. Rb8 Ra2 4. Kb7 Rb2+ 5. Kc8 Rc2+ 6. Kd8 \
+Rh2! 7. Rb6+ Kc5 8. Rc6+! Kxc6 9. a8=Q+ {} \
+{and White has a won queen versus rook endgame – one that is easier \
+to win than one where the rook is close to its king \
+(Silman 2007:223–26).}',
 '<b>Silman, diagram 223</b><br />',
 'White wins');
 </script>
-<p>
-The Lucena method also works with a rook pawn if the white rook is 
-already on the fourth rank, the black rook is not on the file 
-adjacent to the pawn, and White is to move. Otherwise, the 
-defending king must be cut off four files from the pawn, as in the 
-diagram. This is not a true Lucena position since the king is cut 
-off by more than one file. White wins:
-</p><p>
-<b> 1. Rc1 Ke7 2. Rc8 Kd6! 3. Rb8 Ra2 4. Kb7 Rb2+ 5. Kc8 Rc2+ 6. Kd8 
-Rh2! 7. Rb6+ Kc5 8. Rc6+! Kxc6 9. a8=Q+ </b>
-</p><p>
-and White has a won queen versus rook endgame – one that is easier 
-to win than one where the rook is close to its king 
-(Silman 2007:223–26).
 </p><p style="clear:right"> 
 <h3>Similar positions may be drawn</h3>
  <hr />
@@ -267,52 +200,34 @@ versus rook endgame for more details.)
 <h3>Examples from praxis</h3>
 <hr />
  <h4>Rice versus Snape</h4> 
-<div id="diag09"></div>
+<div id="diag09"></div><div id="diag09_pgn"></div>
 <script>
 ChessDiagram.diagram('diag09', '8/5r2/6R1/8/8/8/4K1p1/6k1 b - - 0 81',
-'81... Re7+ 82. Kd2 Re5! 83. Rg8 Kf2 84. Rf8+ Kg3 85. Rg8+ Kf3 86. Kd1 ' +
-'(86. Rf8+ Kg4 87. Rg8+ Rg5) Re4',
+'{In this 2000 game between Rice and Ian Snape, Black uses the above procedure:}{} \
+81... Re7+ 82. Kd2 Re5! 83. Rg8 Kf2 84. Rf8+ Kg3 85. Rg8+ Kf3 {} \
+{Here White deviates from the above:}{} 86. Kd1 \
+({the alternative is:} 86. Rf8+ Kg4 87. Rg8+ Rg5 \
+{and Black wins (Snape 2003:36).}) \
+Re4 {}{White resigns.}',
 '<b>Rice vs. Snape, 2000</b><br />',
 'Black to move wins using the Lucena position');
 </script>
-<p>
-In this 2000 game between Rice and Ian Snape, Black uses the above 
-procedure:
-</p><p>
-<b> 81... Re7+ 82. Kd2 Re5! 83. Rg8 Kf2 84. Rf8+ Kg3 85. Rg8+ Kf3</b>
-</p><p>
-Here White deviates from the above:
-</p><p>
-<b> 86. Kd1 Re4</b> 
-</p><p>
-White resigns, but the alternative is:
-</p><p>
-<b> 86. Rf8+ Kg4 87. Rg8+ Rg5</b> 
-</p><p>
-and Black wins (Snape 2003:36).
 </p><p style="clear:right">
  <h4>Andersson versus Åkesson</h4> 
-<div id="diag10"></div>
+<div id="diag10"></div><div id="diag10_pgn"></div>
 <script>
 ChessDiagram.diagram('diag10', '8/8/3k1K2/3pRP2/8/4P3/8/5r2 w - - 0 79',
-'79. e4! dxe4 80. Rxe4 Kd7 81. Kg6 ' +
-'81...Rg1+ 82.Kf7 Rf1 83.f6 Rf2 84.Kg7 Rg2+ 85.Kf8 Rf2 86.f7 Rg2 ' +
-'87.Rd4+ Kc7 (87... Ke6 88.Ke8)88.Ke7 Re2+ 89. Kf6 Rf2+ 90.Ke6 Re2+ 91.Kf5 Rf2+ 92.Rf4',
+'{In this position from a 1999 game between Ulf Andersson and Ralf \
+Åkesson, White exchanges pawns in order to get to the Lucena position.}{} \
+79. e4! dxe4 80. Rxe4 Kd7 81. Kg6 {}{and Black resigned. \
+White will reach a Lucena position:}{} 81...Rg1+ \
+82.Kf7 Rf1 83.f6 Rf2 84.Kg7 Rg2+ 85.Kf8 Rf2 86.f7 Rg2 {(a Lucena \
+position)} {} 87.Rd4+ Kc7 ({if} 87... Ke6 {then} 88. Ke8 {wins}){} 88.Ke7 Re2+ \
+89. Kf6 Rf2+ 90.Ke6 Re2+ 91.Kf5 Rf2+ 92.Rf4 {} {and White wins (Kaufeld \
+&amp; Kern 2011:189).}',
 '<b>Andersson vs. Åkesson, 1999</b><br />',
 'White to move wins');
 </script>
-<p>
-In this position from a 1999 game between Ulf Andersson and Ralf 
-Åkesson, White exchanges pawns in order to get to the Lucena 
-position.[3]
-</p><p>
-<b> 79. e4! dxe4 80. Rxe4 Kd7 81. Kg6</b> 
-</p><p>
-and Black resigned. White will reach a Lucena position: 81...Rg1+ 
-82.Kf7 Rf1 83.f6 Rf2 84.Kg7 Rg2+ 85.Kf8 Rf2 86.f7 Rg2 (a Lucena 
-position) 87.Rd4+ Kc7 (if 87... Ke6 then 88. Ke8 wins) 88.Ke7 Re2+ 
-89. Kf6 Rf2+ 90.Ke6 Re2+ 91.Kf5 Rf2+ 92.Rf4 and White wins (Kaufeld 
-&amp; Kern 2011:189).
  </p><p style="clear:right">
 <h3>Conclusion</h3>
 <hr /> 
@@ -328,6 +243,5 @@ There is an alternate method for winning this type of position that
 works only for pawns on the c-file through the f-file (see Rook and 
 pawn versus rook endgame).
  </p>
-
 </div></body>
 </html>

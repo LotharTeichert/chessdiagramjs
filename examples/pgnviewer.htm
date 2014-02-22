@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>PGN Viewer</title>
+ <link rel="stylesheet" href="../css/chessboard-0.3.0.css" />
+ <script type="text/javascript" src="../js/json3.js"></script>
+ <script type="text/javascript" src="../js/jquery-2.0.3.min.js"></script>
+ <script type="text/javascript" src="../js/chessboard-0.3.0.js"></script>
+ <script type="text/javascript" src="../js/chessdiagram.js"></script>
+</head>
+<body><div style="font-family:Calibri;font-size:12pt">
+<input type="file" id="files" size="60" name="files[]" onchange="handleFileSelect(event);" />
+<select size="1" id="languageIn">
+ <option value="Czech">Czech</option>
+ <option value="Danish">Danish</option>
+ <option value="Dutch">Dutch</option> 
+ <option value="English"  selected="selected">English</option>
+ <option value="Estonian">Estonian</option>
+ <option value="Finnish">Finnish</option>
+ <option value="French">French</option>
+ <option value="German">German</option> 
+ <option value="Hungarian">Hungarian</option>
+ <option value="Icelandic">Icelandic</option>
+ <option value="Italian">Italian</option> 
+ <option value="Norwegian">Norwegian</option>
+ <option value="Polish">Polish</option> 
+ <option value="Portuguese">Portuguese</option>
+ <option value="Romanian">Romanian</option> 
+ <option value="Spanish">Spanish</option> 
+ <option value="Swedish">Swedish</option>
+</select>
+<b>&rArr;</b>
+<select size="1" id="languageOut">
+ <option value="Czech">Czech</option>
+ <option value="Danish">Danish</option>
+ <option value="Dutch">Dutch</option> 
+ <option value="English"  selected="selected">English</option>
+ <option value="Estonian">Estonian</option>
+ <option value="Finnish">Finnish</option>
+ <option value="French">French</option>
+ <option value="German">German</option> 
+ <option value="Hungarian">Hungarian</option>
+ <option value="Icelandic">Icelandic</option>
+ <option value="Italian">Italian</option> 
+ <option value="Norwegian">Norwegian</option>
+ <option value="Polish">Polish</option> 
+ <option value="Portuguese">Portuguese</option>
+ <option value="Romanian">Romanian</option> 
+ <option value="Spanish">Spanish</option> 
+ <option value="Swedish">Swedish</option>
+ <option value="Unicode">Unicode</option>
+</select>
+<br />
+ <div id="diag01" style="float:left"></div>
+ <div id="diag01_pgn" style="height:480px;overflow-x:hidden;overflow-y:scroll;border:1px solid black;padding:4px"></div>
+ <br />
+<script>
+ChessDiagram.diagram('diag01', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+'', '', '',
+{ divStyle: { backgroundColor:'#e0e0e0', 
+              width:'390px', 
+              styleFloat:'left', cssFloat:'left', 
+              margin:'8px', 
+              padding:'4px' },
+  boardWidth: '340px',
+  languageOut: 'German',
+  languageIn: 'German'} );
+
+var games, dates, whites, blacks, results, sites, events, rounds, fens;
+
+function selectGame(n) {
+  var langIn = 'English';
+  var opts = document.getElementById('languageIn').options;
+  for (var i = 0;i<opts.length;i++) {
+    if (opts[i].selected) { langIn = opts[i].value; }
+  };  
+  var langOut = 'English';
+  opts = document.getElementById('languageOut').options;
+  for (var i = 0;i<opts.length;i++) {
+    if (opts[i].selected) { langOut = opts[i].value; }
+  };  
+  ChessDiagram.diagram('diag01', 
+                      fens[n-1],
+                      games[n-1],
+                      '<b>' + n + '. ' + whites[n-1] + ' - ' + blacks[n-1] + '</b><br />' + dates[n-1],
+                      sites[n-1] + ' &nbsp; ' + results[n-1],
+                      { languageIn: langIn, languageOut: langOut});
+  window.scrollTo(0, 0);
+};
+function handleFileSelect(evt) {
+  var files = evt.target.files; // FileList object
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    // Datei verarbeiten
+    var date, white, black, result, game, site, event, round, fen, lines;
+    if (/\r\n/.test(e.target.result)) {
+      lines = e.target.result.split('\r\n');
+    } else if (/\n/.test(e.target.result)) {
+      lines = e.target.result.split('\n');
+    } else {
+      lines = e.target.result.split('\r');
+    };
+    var html = '<table border="1" cellspacing="0" cellpadding="4"><tr><th>No.</th>' +
+               '<th>Event</th><th>Site</th><th>Date</th><th>Round</th><th>White</th><th>Black</th><th>Result</th><th>Game</th></tr>';
+    date = '&nbsp';    white = '&nbsp';  black = '&nbsp';  result = '&nbsp';
+    event = '&nbsp;';  site = '&nbsp;';  round = '&nbsp;';
+    fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+    game = '';
+    game_ = '';
+    games = [];
+    dates = [];   whites = [];  blacks = [];  results = [];
+    events = [];  sites = [];   rounds = [];  fens = [];
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].search(/\[Date\s+"(.*)"\s*\]/) >= 0) { 
+        date = RegExp.$1;
+      } else if (lines[i].search(/\[White\s+"(.*)"\s*\]/) >= 0) { 
+        white = RegExp.$1;
+      } else if (lines[i].search(/\[Black\s+"(.*)"\s*\]/) >= 0) { 
+        black = RegExp.$1;
+      } else if (lines[i].search(/\[Result\s+"(.*)"\s*\]/) >= 0) { 
+        result = RegExp.$1;
+      } else if (lines[i].search(/\[Event\s+"(.*)"\s*\]/) >= 0) { 
+        event = RegExp.$1;
+      } else if (lines[i].search(/\[Site\s+"(.*)"\s*\]/) >= 0) { 
+        site = RegExp.$1;
+      } else if (lines[i].search(/\[Round\s+"(.*)"\s*\]/) >= 0) { 
+        round = RegExp.$1;
+      } else if (lines[i].search(/\[FEN\s+"(.*)"\s*\]/) >= 0) { 
+        fen = RegExp.$1;
+      } else if (lines[i].search(/\[.*\]/) >= 0) { // ignore
+      } else if (lines[i].search(/\S+/) >= 0) {
+        game_ += (' ' + lines[i]);
+        if (game == '') { 
+          game = lines[i];
+        };
+      } else if (game == '') { // ignore leading empty line
+      } else {
+        games[games.length] = game_;
+        dates[dates.length] = date;
+        whites[whites.length] = white;
+        blacks[blacks.length] = black;
+        results[results.length] = result;
+        events[events.length] = event;
+        sites[sites.length] = site;
+        rounds[rounds.length] = round;
+        fens[fens.length] = fen;
+        html += '<tr onclick="selectGame(' + games.length + ')"><td align="right">' + 
+                games.length + '</td><td>' + 
+                event + '</td><td>' + 
+                site + '</td><td>' + 
+                date + '</td><td align="center">' + 
+                round + '</td><td>' + 
+                white + '</td><td>' + black + '</td><td align="center">' + 
+                result + '</td><td>' + game + '</td></tr>';
+        date = '&nbsp';    white = '&nbsp';  black = '&nbsp';  result = '&nbsp';
+        event = '&nbsp;';  site = '&nbsp;';  round = '&nbsp;'; 
+        fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+        game = '';
+        game_ = '';
+      };
+    };
+    html += '</table>';
+    document.getElementById("content").innerHTML = html;
+  };
+  reader.readAsText(files[0]);
+};
+</script>
+<div id="content" style="clear:left"></div>
+</div></body>
+</html>

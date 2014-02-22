@@ -11,9 +11,11 @@ display games and problems in prepared form. Searching on the internet I found <
 by <i>Chris Oakman</i>, a javascript that makes best animation of chess moves in my opinion.
 For simple integration in web sites with commenting text I created the javascript <b>ChessDiagram</b>.
 </p><p>
-In the menu you will find two pages demonstrating the virtue of these diagrams. I simply copied the text
-of two wikipedia pages and replaced the picture diagrams. The commented moves now can be played in the
-diagrams and you can try your own moves as well. (Note that pawn promotion will always give a queen at first,
+In the menu you will find some pages demonstrating the virtue of these diagrams. For two of them 
+(Lucena and Morphy) I simply copied the text
+of a wikipedia page and replaced the picture diagrams. The commented moves now can be played in the
+diagrams and you can try your own moves as well. (Note that pawn promotion will always give 
+a queen at first,
 but you can drag the promoted piece off the board to get another one.)
 </p><p>
 <h4>Usage</h4>
@@ -33,7 +35,7 @@ To use the diagrams on HTML page, you have to link a style sheet and four script
 Now the body may contain sections like:
 <pre style="font-size:10pt">
 ...
-&lt;div id="diag01">&lt;/div>
+&lt;div id="diag01">&lt;/div>&lt;div id="diag01_pgn">&lt;/div>
 &lt;script>
 ChessDiagram.diagram('diag01', 
 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -55,15 +57,20 @@ at the end of the page.
 </p><p>
 The parameters of ChessDiagram.diagram are:
 <ul>
- <li>The Id of the div-tag to display the board.</li>
+ <li>The Id of the div-tag to display the board. Another Id is derived from that one by appending '_pgn'.
+ It determines the div-tag containing the moves and comments. If this div-tag is not found on the
+ page, the diagram will contain another button [+] to display this text below the diagram
+ when clicked.</li>
  <li>A description of the position as a FEN string (see wikipedia for explanation).</li>
- <li>The move list to be shown. Permitted is algebraic notation, long or short, in English or German (don't use the
-  <i>B</i> in German to avoid confusion), move numbers and dots allowed. That should make it as simple as possible to generate
-  a move list from existing text.</li>
+ <li>The move list to be shown. Permitted is algebraic notation, long or short, including variations
+  and comments, move numbers and dots allowed. That should make it as simple as possible to generate
+  a move list from existing text. The language in which moves are given, as well as the language
+  in which the moves are displayed, can be configured.</li>
  <li>A header for the diagram, possibly HTML formatted.</li>
  <li>A footer for the diagram, possibly HTML formatted.</li>
  <li>Additional options (in curly brackets). Might be missing (one parameter less) and will hold until
-  the next call to ChessDiagram.diagram with options present. They are:
+  the next call to ChessDiagram.diagram with options present. Some of them are only for specialists.
+  They are:
   <ul>
   <li> divStyle: additional style attributes for the div-tag. 
    Handy to format all diagrams in one place (the first call to ChessDiagram.diagram).</li>
@@ -75,8 +82,16 @@ The parameters of ChessDiagram.diagram are:
   and it's name is <i>img</i>.</li>
   <li>notationStyle: style (like a HTML style string) for a table containing the board. The first and last row and column
    of this table contain the traditional board notation (if selected), so you can format it with this string. Default:
-'background-color:#f0f0f0;font-family:Lucida Console;font-size:12px;line-height:200%'
-</li>
+'background-color:#f0f0f0;font-family:Lucida Console;font-size:12px;line-height:200%'</li>
+  <li>orientation: 'white' (default) or 'black', decides the side to look at the board.</li>
+  <li>pgnFormat: 1 (default) makes a simple formatting of moves and comments: moves of the main line are 
+   bold, moves of variations italique; a change to comments or variations within the main line is 
+   emphasized by a linebreak. pgnFormat = 0 turns this off and you have to make HTML-formatting in 
+   the text by yourself.</li>
+  <li>languageIn: The language (in English), used by the the move list, default is 'English'</li>
+  <li>languageOut: The language (in English), used when the moves are diplayed in the page, 
+   default is 'English', 'Unicode' is possible.</li> 
+  <li>
   </ul></li>
 </ul>
 </p>

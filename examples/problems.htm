@@ -1,0 +1,59 @@
+<html>
+<head>
+ <title>Schachminiaturen</title>
+ <link rel="stylesheet" href="../css/chessboard-0.3.0.css" />
+ <script type="text/javascript" src="../js/json3.js"></script>
+ <script type="text/javascript" src="../js/jquery-2.0.3.min.js"></script>
+ <script type="text/javascript" src="../js/chessboard-0.3.0.js"></script>
+ <script type="text/javascript" src="../js/chessdiagram.js"></script>
+</head>
+<body><div style="font-family:Calibri;font-size:12pt">
+<p>
+Die folgenden Aufgaben stammen aus "Schachminiaturen, Eine Problemsammlung" 
+von Oscar Blumenthal.
+</p>
+<p>
+Anders Thulin hat sie elektonisch aufbereitet und auf
+seiner Website <a href="http://www.anders.thulin.name">www.anders.thulin.name</a> zur Verfügung gestellt.
+<hr />
+<table border="0" cellpadding="8">
+<tr><td><div id="diag01"></div></td><td><div id="diag02"></div></td></tr>
+<tr><td><div id="diag03"></div></td><td><div id="diag04"></div></td></tr>
+<tr><td><div id="diag05"></div></td><td><div id="diag06"></div></td></tr>
+<tr><td><div id="diag07"></div></td><td><div id="diag08"></div></td></tr>
+<tr><td><div id="diag09"></div></td><td><div id="diag10"></div></td></tr>
+<tr><td><div id="diag11"></div></td><td><div id="diag12"></div></td></tr>
+<tr><td><div id="diag13"></div></td><td><div id="diag14"></div></td></tr>
+</table>
+<script>
+ChessDiagram.diagram('diag01', '8/8/3K4/8/3k4/5Q2/2R5/8 w - - 0 1',
+'Df3-h3','<b>George Edward Carpenter</b>','<b>#2</b>',
+{ divStyle: { backgroundColor:'#e0e0e0', 
+              width:'290px', 
+              margin:'8px', 
+              padding:'4px' },
+  languageIn: "German",
+  languageOut: "Unicode"} );
+ChessDiagram.diagram('diag02', '8/8/7R/2KQ4/5k2/8/8/8 w - - 0 1',
+'Dd5-g2','<b>Johannes Hane</b>','<b>#3</b>');
+var problems = [
+['Johannes Hane','8/4k3/2B4Q/7K/8/8/8/8','#3','Lc6-b5'],
+['C. Hartlaub','8/1Q1Pk3/8/8/8/4K3/8/8','#3','Ke3-f4'],
+['Jasper Jespersen','8/1k6/8/R7/8/1K6/7Q/8','#3','Kb3-c4'],
+['J. Kohtz; C. Kockelkorn','5B2/8/8/6Q1/k7/8/8/4K3','#3','Ke1-e2'],
+['Rudolf L\'hermet','3R4/4P3/8/8/K1k5/8/8/8','#3','e7-e8T'],
+['Sigmund Lehner','8/k7/1pK5/8/8/8/8/1R6','#3','Tb1-c1'],
+['W. A. Shinkman','8/8/4R3/8/7K/7R/6k1/8','#3','Th3-h1'],
+['W. A. Shinkman','8/2N2Q2/8/4k3/8/3K4/8/8','#3','Sc7-a8'],
+['Z. Mach','5R2/8/8/4k3/1Q6/8/8/5K2','#4','Db4-b6'],
+['W. A. Shinkman','8/1K6/8/B5Q1/k7/8/8/8','#4','Dg5-c1'],
+['W. A. Shinkman','8/8/8/7Q/4k3/K7/7R/8','#4','Dh5-f7'],
+['Samuel Loyd','8/8/8/8/8/Q7/4p3/5k1K','#5','Da3-d8+']];
+for (var i=0;i<problems.length;i++) {
+  ChessDiagram.diagram((i<7) ? ('diag0' + (i+3)) : ('diag' + (i+3)),
+    problems[i][1] + ' w - - 0 1', problems[i][3],
+    '<b>' + problems[i][0] + '</b>', '<b>' + problems[i][2] + '</b>'); 
+};
+</script>
+</div></body>
+</html>

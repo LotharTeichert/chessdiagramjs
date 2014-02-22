@@ -17,6 +17,23 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 var ChessDiagram = new function() {
 
+// Workaround to get the img path
+// We assume the img directory is a sibling of the script directory and its name is "img"
+  var scripts = document.getElementsByTagName('script');          // get all scripts on the page, this one is the last!
+  var path = scripts[scripts.length-1].src.split('?')[0];         // remove any ?query
+  var imgPath = path.split('/').slice(0, -2).join('/') + '/img/'; // remove last filename parts and add directory name
+  var pieceTheme = imgPath + 'chesspieces/wikipedia/{piece}.png';
+// Options
+  var languageIn = "English";
+  var languageOut = "English";
+  var orientation = 'white';
+  var pgnFormat = '2';
+  var divStyle = '-';
+  var notationStyle = 'background-color:#f0f0f0;font-family:Lucida Console;font-size:12px;line-height:200%';
+  var boardWidth = '240px';
+  var showNotation = 1;
+// values for showNotation = 1: traditional notation, 2: ChessBoard notation (inside board), 3: no notation, 
+
   var movePattern = { 
   K: [/(K(?:.?.?.{7})?x)/, /(x(?:.?.?.{7})?K)/],
   R: [/(R1{0,7}x)/, /(R.{8}(?:1.{8}){0,7}x)/, /(x1{0,7}R)/, /(x.{8}(?:1.{8}){0,7}R)/],
@@ -42,6 +59,7 @@ var ChessDiagram = new function() {
   var castlingPattern = /^(?:\d)*(?:\.)*O-O(-O)?/;
   var pieceMovePattern = /^(?:\d)*(?:\.)*([KQRBN])([a-h]?)([1-8]?)[-x:]?([a-h])([1-8])/;
   var pawnMovePattern = /^(?:\d)*(?:\.)*(?:P)?([a-h]?)([1-8]?)[-x:]?([a-h])([1-8]?)[x:]?=?([QBRN]?) ?(e\.?p)?/;
+  var resultPattern = /[(?:1\-0)(?:0\-1)(?:1/2\-1/2)(?:\*)]/;
 
   var boards = [];
 // This is a list of all diagrams on the page.
@@ -52,6 +70,10 @@ var ChessDiagram = new function() {
 //   movePtr:       array of numbers indicating the diagram position in the move/fen-tree
 //   id:            HTML-Id of DIV-tag to be used
 //   dragPromotion: target + piece if a promotion takes place by dragging
+//   lineMove:      number of move in the current line
+//   lineFens:      array fen strings for current line
+//   lineMoves:     array of move strings for current line
+//   showPGN:       display status of the associated pgn div       
 
   var board, sideToMove, castle, ep, halfMoves, moveCount, moveParts;
 
@@ -139,7 +161,7 @@ var ChessDiagram = new function() {
         board = board.substr(0, 4) + '1rk1' + board.substr(8, 63);
       } else {
 // Black queen side castle
-        board = '11rk1' + board.substr(5, 66);
+        board = '11kr1' + board.substr(5, 66);
       };
       castle = castle.replace(/[qk]/g, '');
     };
@@ -360,7 +382,7 @@ var ChessDiagram = new function() {
     halfMoves = '*';
   };
 
-// Promotion support in drag mode 
+// Promotion support in drag mode (callback functions for ChessBoard)
 
   onDrop = function(b, source, target, piece) {
 // If a pawn is dropped on its last rank, promotion is to queen,
@@ -393,21 +415,6 @@ var ChessDiagram = new function() {
     };
   };
 
-// Workaround to get the img path
-// We assume the img directory is a sibling of the script directory and its name is "img"
-  var scripts = document.getElementsByTagName('script');          // get all scripts on the page, this one is the last!
-  var path = scripts[scripts.length-1].src.split('?')[0];         // remove any ?query
-  var imgPath = path.split('/').slice(0, -2).join('/') + '/img/'; // remove last filename parts and add directory name
-  var pieceTheme = imgPath + 'chesspieces/wikipedia/{piece}.png';
-
-  var languageIn = "English";
-  var languageOut = "English";
-  var divStyle = '-';
-  var notationStyle = 'background-color:#f0f0f0;font-family:Lucida Console;font-size:12px;line-height:200%';
-  var boardWidth = '240px';
-  var showNotation = 1;
-// values for showNotation = 1: traditional notation, 2: ChessBoard notation (inside board), 3: no notation, 
-
   function initFens(fens, moves) {
 // Initialize the fens of the position before a move, for all moves of a line.
 // The first one is already given, we set it again for simplicity.
@@ -423,13 +430,8 @@ var ChessDiagram = new function() {
       };
     };
   };
-  function moveTree(moves, prefix, m, p) {
-// generate a string of spans for each move
-    var s = '';
-    var moveOut;
-    for (var i = 0; i < moves.length; i++) {
-      if (typeof(moves[i]) == 'string') {
-/* output language support
+
+/* language support ------------------------------------------------------------------------------------
 Czech      P J S V D K 
 Danish     B S L T D K 
 Dutch      O P L T D K 
@@ -447,98 +449,293 @@ Portuguese P C B T D R
 Romanian   P C N T D R 
 Spanish    P C A T D R 
 Swedish    B S L T D K 
+output only:
+Unicode    &#9817; .. &#9812; (White)
+           &#9823; .. &#9818; (Black)
 */
-        moveOut = moves[i];
-        switch (languageOut) {
-        case "German":
-        case "Danish":
-        case "Norwegian":
-        case "Swedish":
-          moveOut = moveOut.replace(/N/g, 'S').replace(/B/g, 'L').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/P/g, 'B');
-          break;
-        case "Czech":
-          moveOut = moveOut.replace(/N/g, 'J').replace(/B/g, 'S').replace(/R/g, 'V').replace(/Q/g, 'D');
-          break;
-        case "Finnish":
-          moveOut = moveOut.replace(/B/g, 'L').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/N/g, 'R');
-          break;
-        case "French":
-          moveOut = moveOut.replace(/N/g, 'C').replace(/B/g, 'F').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/K/g, 'R');
-          break;
-        case "Hungarian":
-          moveOut = moveOut.replace(/N/g, 'H').replace(/B/g, 'F').replace(/R/g, 'B').replace(/Q/g, 'V').replace(/P/g, 'G');
-          break;
-        case "Icelandic":
-          moveOut = moveOut.replace(/R/g, 'H').replace(/Q/g, 'D').replace(/N/g, 'R');
-          break;
-        case "Italian":
-        case "Spanish":
-          moveOut = moveOut.replace(/N/g, 'C').replace(/B/g, 'A').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/K/g, 'R');
-          break;
-        case "Polish":
-          moveOut = moveOut.replace(/N/g, 'S').replace(/B/g, 'G').replace(/R/g, 'W').replace(/Q/g, 'H');
-          break;
-        case "Portuguese":
-          moveOut = moveOut.replace(/N/g, 'C').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/K/g, 'R');
-          break;
-        case "Romanian":
-          moveOut = moveOut.replace(/N/g, 'C').replace(/B/g, 'N').replace(/R/g, 'T').replace(/Q/g, 'D').replace(/K/g, 'R');
-          break;
-        case "Dutch":
-          moveOut = moveOut.replace(/P/g, 'O').replace(/N/g, 'P').replace(/B/g, 'L').replace(/R/g, 'T').replace(/Q/g, 'D');
-          break;
-        case "Estonian":
-          moveOut = moveOut.replace(/B/g, 'O').replace(/R/g, 'V').replace(/Q/g, 'L').replace(/N/g, 'R');
-          break;
-        };
-        if (p == 'w') {
-          s += (' ' + m + '.' + prefix + i + '])">' + moveOut + '</span> ');
-          p = 'b';
-        } else {
-          if (i==0) {
-            s += (' ' + m + '...' + prefix + i + '])">' + moveOut + '</span> ');
-          } else {
-            s += (prefix + i + '])">' + moveOut + '</span> ');
-          };
-          m += 1;
-          p = 'w';
-        };
-      } else {
-        if (p == 'w') {
-          s += ('(' + moveTree(moves[i], prefix + i + ',', m-1, 'b') + ')');
-        } else {
-          s += ('(' + moveTree(moves[i], prefix + i + ',', m, 'w') + ')');
-        };
-      };
+  function replaceChain(s, fromTo) {
+  // Do replaces in distinct order. fromTo is an array of two arrays. 
+  // The first one is an array of regular expressions, the second an array of strings.
+    var r = s;
+    for (var i = 0; i< fromTo[0].length; i++){
+      r = r.replace(fromTo[0][i], fromTo[1][i]);
     };
-    return s;
+    return r;
   };
-// Public ------------------------------------------------------------------------------
-  return {
 
-    togglePGN: function(b) {
-      if (boards[b].showPGN) {
-        document.getElementById(boards[b].id + '_pgn').style["display"] = "none";
-        boards[b].showPGN = false;
-      } else {
-        document.getElementById(boards[b].id + '_pgn').style["display"] = "inline";
-        boards[b].showPGN = true;
-      };
-    },
+  var translateOutTable = { 
+    Danish:     [[/N/g, /B/g, /R/g, /Q/g, /P/g],       ['S', 'L', 'T', 'D', 'B']],
+    German:     [[/N/g, /B/g, /R/g, /Q/g, /P/g],       ['S', 'L', 'T', 'D', 'B']],
+    Norwegian:  [[/N/g, /B/g, /R/g, /Q/g, /P/g],       ['S', 'L', 'T', 'D', 'B']],
+    Swedish:    [[/N/g, /B/g, /R/g, /Q/g, /P/g],       ['S', 'L', 'T', 'D', 'B']],
+    Czech:      [[/N/g, /B/g, /R/g, /Q/g],             ['J', 'S', 'V', 'D']],
+    Finnish:    [[/B/g, /R/g, /Q/g, /N/g],             ['L', 'T', 'D', 'R']],
+    Hungarian:  [[/N/g, /B/g, /R/g, /Q/g, /P/g],       ['F', 'F', 'B', 'V', 'G']],
+    French:     [[/N/g, /B/g, /R/g, /Q/g, /K/g],       ['C', 'F', 'T', 'D', 'R']],
+    Icelandic:  [[/R/g, /Q/g, /N/g],                   ['H', 'D', 'R']],
+    Italian:    [[/N/g, /B/g, /R/g, /Q/g, /K/g],       ['C', 'A', 'T', 'D', 'R']],
+    Spanish:    [[/N/g, /B/g, /R/g, /Q/g, /K/g],       ['C', 'A', 'T', 'D', 'R']],
+    Polish:     [[/N/g, /B/g, /R/g, /Q/g],             ['S', 'G', 'W', 'H']],
+    Portuguese: [[/N/g, /R/g, /Q/g, /K/g],             ['C', 'T', 'D', 'R']],
+    Romanian:   [[/N/g, /B/g, /R/g, /Q/g, /K/g],       ['C', 'N', 'T', 'D', 'R']],
+    Dutch:      [[/P/g, /N/g, /B/g, /R/g, /Q/g],       ['O', 'P', 'L', 'T', 'D']],
+    Estonian:   [[/B/g, /R/g, /Q/g, /N/g],             ['O', 'V', 'L', 'R']],
+    Unicodew:   [[/P/g, /N/g, /B/g, /R/g, /Q/g, /K/g], ['&#9817;', '&#9816;', '&#9815;', '&#9814;', '&#9813;', '&#9812']],
+    Unicodeb:   [[/P/g, /N/g, /B/g, /R/g, /Q/g, /K/g], ['&#9823;', '&#9822;', '&#9821;', '&#9820;', '&#9819;', '&#9818']]
+  };
+  
+  var translateInTable = { 
+    Danish:     [[/B/g, /S/g, /L/g, /T/g, /D/g],       ['P', 'N', 'B', 'R', 'Q']],
+    German:     [[/B/g, /S/g, /L/g, /T/g, /D/g],       ['P', 'N', 'B', 'R', 'Q']],
+    Norwegian:  [[/B/g, /S/g, /L/g, /T/g, /D/g],       ['P', 'N', 'B', 'R', 'Q']],
+    Swedish:    [[/B/g, /S/g, /L/g, /T/g, /D/g],       ['P', 'N', 'B', 'R', 'Q']],
+    Czech:      [[/J/g, /S/g, /V/g, /D/g],             ['N', 'B', 'R', 'Q']],
+    Finnish:    [[/R/g, /L/g, /T/g, /D/g],             ['N', 'B', 'R', 'Q']],
+    Hungarian:  [[/G/g, /H/g, /B/g, /V/g, /F/g],       ['P', 'N', 'R', 'Q', 'B']],
+    French:     [[/C/g, /F/g, /D/g, /R/g, /T/g],       ['N', 'B', 'Q', 'K', 'R']],
+    Icelandic:  [[/R/g, /H/g, /D/g],                   ['N', 'R', 'Q']],
+    Italian:    [[/C/g, /A/g, /D/g, /R/g, /T/g],       ['N', 'B', 'Q', 'K', 'R']],
+    Spanish:    [[/C/g, /A/g, /D/g, /R/g, /T/g],       ['N', 'B', 'Q', 'K', 'R']],
+    Polish:     [[/S/g, /G/g, /W/g, /H/g],             ['N', 'B', 'R', 'Q']],
+    Portuguese: [[/C/g, /D/g, /R/g, /T/g],             ['N', 'Q', 'K', 'R']],
+    Romanian:   [[/N/g, /D/g, /R/g, /T/g, /C/g],       ['B', 'Q', 'K', 'R', 'N']],
+    Dutch:      [[/P/g, /L/g, /T/g, /D/g, /O/g],       ['N', 'B', 'R', 'Q', 'P']],
+    Estonian:   [[/R/g, /O/g, /V/g, /L/g],             ['N', 'B', 'R', 'Q']],
+  };
 
-    m: function(b, newMovePtr) {
-// b is the number of a diagram.
+  function translateOut(move, player) {
+// The move is in English. Translate it to languageOut.
+// Only if languageOut == 'Unicode' player ('w' of 'b') is necessary.
+    if (translateOutTable[languageOut]) {
+      return replaceChain(move, translateOutTable[languageOut]);
+    } else if (languageOut == 'Unicode') {
+      return replaceChain(move, translateOutTable['Unicode' + player]);
+    } else return move;
+  };    
+
+  function translateIn(move) {
+// The move is in languageIn. Translate it to English.
+// Languages using 'O' require correction of Castling.
+    if (translateInTable[languageIn]) {
+      move = replaceChain(move, translateInTable[languageIn]);
+    };
+    if (languageIn == "Dutch") { return move.replace(/P-P-P/g, 'O-O-O').replace(/P-P/g, 'O-O'); };
+    if (languageIn == "Estonian") { return move.replace(/B-B-B/g, 'O-O-O').replace(/B-B/g, 'O-O'); };
+    return move;
+  };    
+
+// Numeric annotation glyphs
+  var NAG = [
+  'null annotation', 
+  '(!)', 
+  '(?)', 
+  '(!!)',
+  '(??)', 
+  '(!?)', 
+  '(?!)', 
+  'forced move (all others lose quickly)', 
+  'singular move (no reasonable alternatives)', 
+  'worst move', 
+  'drawish position', 
+  'equal chances, quiet position', 
+  'equal chances, active position', 
+  'unclear position', 
+  'White has a slight advantage', 
+  'Black has a slight advantage', 
+  'White has a moderate advantage', 
+  'Black has a moderate advantage', 
+  'White has a decisive advantage', 
+  'Black has a decisive advantage', 
+  'White has a crushing advantage (Black should resign)', 
+  'Black has a crushing advantage (White should resign)', 
+  'White is in zugzwang', 
+  'Black is in zugzwang', 
+  'White has a slight space advantage', 
+  'Black has a slight space advantage', 
+  'White has a moderate space advantage', 
+  'Black has a moderate space advantage', 
+  'White has a decisive space advantage', 
+  'Black has a decisive space advantage', 
+  'White has a slight time (development) advantage', 
+  'Black has a slight time (development) advantage', 
+  'White has a moderate time (development) advantage', 
+  'Black has a moderate time (development) advantage', 
+  'White has a decisive time (development) advantage', 
+  'Black has a decisive time (development) advantage', 
+  'White has the initiative', 
+  'Black has the initiative', 
+  'White has a lasting initiative', 
+  'Black has a lasting initiative', 
+  'White has the attack', 
+  'Black has the attack', 
+  'White has insufficient compensation for material deficit', 
+  'Black has insufficient compensation for material deficit', 
+  'White has sufficient compensation for material deficit', 
+  'Black has sufficient compensation for material deficit', 
+  'White has more than adequate compensation for material deficit',
+  'Black has more than adequate compensation for material deficit', 
+  'White has a slight center control advantage', 
+  'Black has a slight center control advantage', 
+  'White has a moderate center control advantage', 
+  'Black has a moderate center control advantage', 
+  'White has a decisive center control advantage', 
+  'Black has a decisive center control advantage', 
+  'White has a slight kingside control advantage', 
+  'Black has a slight kingside control advantage', 
+  'White has a moderate kingside control advantage', 
+  'Black has a moderate kingside control advantage', 
+  'White has a decisive kingside control advantage', 
+  'Black has a decisive kingside control advantage', 
+  'White has a slight queenside control advantage', 
+  'Black has a slight queenside control advantage', 
+  'White has a moderate queenside control advantage', 
+  'Black has a moderate queenside control advantage', 
+  'White has a decisive queenside control advantage', 
+  'Black has a decisive queenside control advantage', 
+  'White has a vulnerable first rank', 
+  'Black has a vulnerable first rank', 
+  'White has a well protected first rank', 
+  'Black has a well protected first rank', 
+  'White has a poorly protected king', 
+  'Black has a poorly protected king', 
+  'White has a well protected king', 
+  'Black has a well protected king', 
+  'White has a poorly placed king', 
+  'Black has a poorly placed king', 
+  'White has a well placed king', 
+  'Black has a well placed king', 
+  'White has a very weak pawn structure', 
+  'Black has a very weak pawn structure', 
+  'White has a moderately weak pawn structure', 
+  'Black has a moderately weak pawn structure', 
+  'White has a moderately strong pawn structure', 
+  'Black has a moderately strong pawn structure', 
+  'White has a very strong pawn structure', 
+  'Black has a very strong pawn structure', 
+  'White has poor knight placement', 
+  'Black has poor knight placement', 
+  'White has good knight placement', 
+  'Black has good knight placement', 
+  'White has poor bishop placement', 
+  'Black has poor bishop placement', 
+  'White has good bishop placement', 
+  'Black has good bishop placement', 
+  'White has poor rook placement', 
+  'Black has poor rook placement', 
+  'White has good rook placement', 
+  'Black has good rook placement', 
+  'White has poor queen placement', 
+  'Black has poor queen placement', 
+  'White has good queen placement', 
+  'Black has good queen placement', 
+  'White has poor piece coordination', 
+  'Black has poor piece coordination', 
+  'White has good piece coordination', 
+  'Black has good piece coordination', 
+  'White has played the opening very poorly', 
+  'Black has played the opening very poorly', 
+  'White has played the opening poorly', 
+  'Black has played the opening poorly', 
+  'White has played the opening well', 
+  'Black has played the opening well', 
+  'White has played the opening very well', 
+  'Black has played the opening very well', 
+  'White has played the middlegame very poorly', 
+  'Black has played the middlegame very poorly', 
+  'White has played the middlegame poorly', 
+  'Black has played the middlegame poorly',
+  'White has played the middlegame well', 
+  'Black has played the middlegame well', 
+  'White has played the middlegame very well', 
+  'Black has played the middlegame very well', 
+  'White has played the ending very poorly', 
+  'Black has played the ending very poorly', 
+  'White has played the ending poorly', 
+  'Black has played the ending poorly', 
+  'White has played the ending well', 
+  'Black has played the ending well', 
+  'White has played the ending very well', 
+  'Black has played the ending very well', 
+  'White has slight counterplay', 
+  'Black has slight counterplay',
+  'White has moderate counterplay', 
+  'Black has moderate counterplay', 
+  'White has decisive counterplay', 
+  'Black has decisive counterplay', 
+  'White has moderate time control pressure', 
+  'Black has moderate time control pressure', 
+  'White has severe time control pressure', 
+  'Black has severe time control pressure']; 
+
+  function movePtr2String(movePtr) {
+// this will translate a tree pointer to a string
+    return '_' + movePtr.join('_');
+  };
+  
+  function highlightMove_Board(bd, newMovePtr) {
+  // A move was made in bd.
+  // Lowlight the last move shown, highlight the new move shown.
+    document.getElementById(bd.id + movePtr2String(bd.movePtr)).style['color'] = 'black'; 
+    bd.movePtr = newMovePtr;
+    document.getElementById(bd.id + movePtr2String(bd.movePtr)).style['color'] = 'red';
+  };
+
+  function togglePGN_Board(bd) {
+// If there is no pgnDiv given, the pgn can be shown below the board.
+// This function is invoked by a button to toggle the display on and off.
+    if (bd.showPGN) {
+      document.getElementById(bd.id + '_pgn').style["display"] = "none";
+      bd.showPGN = false;
+    } else {
+      document.getElementById(bd.id + '_pgn').style["display"] = "inline";
+      bd.showPGN = true;
+    };
+  };
+    
+  function setOrientation_Board(bd, side) {
+// Sets the orientation of the board.
+// Somewhat lengthy, because we may have our own traditional board notation. 
+// Side is 'white', 'black', or 'flip'.
+    var columns = 'hgfedcba';
+    var rows = '12345678';
+    bd.board.orientation(side);
+    if (showNotation != 1) { return; };
+    var t = document.getElementById(bd.id + '_table').firstChild;
+    if (bd.board.orientation() == 'white') {
+      columns = 'abcdefgh';
+      rows = '87654321';
+    };
+    for (var i = 0;i < 8;i++) {
+      t = t.nextSibling;
+      t.innerHTML = columns.charAt(i);
+    };
+    t = t.parentNode;
+    for (var i = 0;i < 8;i++) {
+      t = t.nextSibling;
+      t.firstChild.innerHTML = rows.charAt(i);
+      t.lastChild.innerHTML = rows.charAt(i);
+    };
+    t = t.nextSibling.firstChild;
+    for (var i = 0;i < 8;i++) {
+      t = t.nextSibling;
+      t.innerHTML = columns.charAt(i);
+    };
+  };
+
+  function position_Board(bd, newMovePtr) {
 // newMovePtr is an array to select a move in the move tree.
+// It must point to a string in the move tree!
 // This move will be visualized and its line will become the
-// currently line of the diagram.
+// current line of the diagram.
 // If necessary, missing fens will be initialized.
-      var bd = boards[b];
       var moves = bd.moves;
       var fens = bd.fens;
       var newFen, oldFen;
+// Climb up to the selected line.
       for (var i = 0; i < newMovePtr.length-1; i++) {
         if (moves.length > fens.length) { 
-// this line has not been shown so far, so compute all fen strings.
+// This line has not been shown so far, so compute all fen strings.
+// (I'd like to avoid computing all fen strings of a game in advance.)
           initFens(fens, moves);
         };
         moves = moves[newMovePtr[i]];
@@ -547,6 +744,11 @@ Swedish    B S L T D K
       if (moves.length > fens.length) {
         initFens(fens, moves);
       };
+// Finally we reached the line corresponding to the length of newMovePtr.
+      bd.lineMoves = moves;
+      bd.lineFens = fens;
+// We show the postion before the move without animation,
+// make the move and show the position after the move with animation.
       var k = newMovePtr[newMovePtr.length-1];
       bd.board.position(fens[k], false);
       newFen = makeMove(fens[k], moves[k]);
@@ -556,234 +758,385 @@ Swedish    B S L T D K
         newFen.split(' ')[5] + '.';
       document.getElementById(bd.id + '_col').src = 
         imgPath + newFen.split(' ')[1] + '.png';
-      bd.lineMoves = moves;
-      bd.lineFens = fens;
-      bd.movePtr = k+1;
-      if (bd.movePtr < bd.lineMoves.length) {
-        if (typeof(bd.lineMoves[bd.movePtr]) != 'string') {
-          bd.movePtr += 1;
+// Now let lineMove point to the move, that should be made in 
+// the displayed position.
+      bd.lineMove = k+1;
+      while ((bd.lineMove < bd.lineMoves.length) &&
+             (typeof(bd.lineMoves[bd.lineMove]) != 'string')) {
+        bd.lineMove += 1;
+      };
+// At last highlight the text.
+      highlightMove_Board(bd, newMovePtr);
+    };
+
+  function advRew_Board(bd, pos) {
+// Advance or Rewind the position of board bd
+//  - to starting position (pos = 0),
+//  - to next position (pos > 0) or 
+//  - to previous position (else).
+// lineMoves[lineMove] is always a string!    
+
+// Exception: there are no pgn data, so simply restore start position
+    if (bd.moves.length==0) {
+      bd.board.position(bd.fens[0]);
+      return;
+    };
+
+    var movePtr = [];
+    var newFen;
+    for (var i=0;i<bd.movePtr.length;i++) { movePtr[i] = bd.movePtr[i] };
+    if (bd.lineFens.length < bd.lineMoves.length) {
+      initFens(bd.lineFens, bd.lineMoves);
+    };
+    if (pos == 0) { 
+      bd.lineMove = 0;
+      movePtr[movePtr.length-1] = 'x';
+    } else if (pos > 0) {
+      if (bd.lineMove < bd.lineMoves.length) {
+        movePtr[movePtr.length-1] = bd.lineMove;
+        bd.lineMove += 1;
+        while ((bd.lineMove < bd.lineMoves.length) &&
+               (typeof(bd.lineMoves[bd.lineMove]) != 'string')) {
+          bd.lineMove += 1;
         };
       };
-    },
-
-    show: function (b, pos) {
-// Show the diagram boards[b] ...
-//  ... in starting position (pos = 0),
-//  next position (pos > 0) or previous position (else).
-// lineMoves[movePtr] is always a string!
-// if lineMoves[movePtr] is not a string then lineMoves[movePtr-1] is!
-      var newFen;
-      var bd = boards[b];
-      if (bd.lineFens.length < bd.lineMoves.length) {
-        initFens(bd.lineFens, bd.lineMoves);
+    } else {
+      if (bd.lineMove > 0) {
+        bd.lineMove -= 1;
+        while ((bd.lineMove > 0) &&
+               (typeof(bd.lineMoves[bd.lineMove]) != 'string')) {
+          bd.lineMove -= 1;
+        };
+        if (bd.lineMove > 0) {
+          var i = bd.lineMove - 1;
+          while ((i > 0) &&
+                 (typeof(bd.lineMoves[i]) != 'string')) {
+            i -= 1;
+          };
+          movePtr[movePtr.length-1] = i;
+        } else {
+          movePtr[movePtr.length-1] = 'x';
+        };
       };
-      if (pos == 0) { 
-        bd.movePtr = 0;
-      } else if (pos > 0) {
-        if (bd.movePtr < bd.lineMoves.length) {
-          bd.movePtr += 1;
-          if (bd.movePtr < bd.lineMoves.length) {
-            if (typeof(bd.lineMoves[bd.movePtr]) != 'string') {
-              bd.movePtr += 1;
+    };
+    bd.dragPromotion = '';
+    if (bd.lineMove < bd.lineMoves.length) {
+      newFen = bd.lineFens[bd.lineMove];
+    } else {
+      for (var i=bd.lineMove-1;i>=0;i--) {
+        if (typeof(bd.lineMoves[i]) == 'string') {
+          newFen = makeMove(bd.lineFens[i], bd.lineMoves[i]);
+          break;
+        };
+      };
+    };
+    bd.board.position(newFen);
+    document.getElementById(bd.id + '_num').innerHTML = 
+      newFen.split(' ')[5] + '.';
+    document.getElementById(bd.id + '_col').src = 
+      imgPath + newFen.split(' ')[1] + '.png';
+    highlightMove_Board(bd, movePtr);
+  };
+
+  function getOptions(options) {
+// Overwrite options where given
+    if (options['languageIn'])       { languageIn       = options['languageIn']; };
+    if (options['languageOut'])      { languageOut      = options['languageOut']; };
+    if (options['showNotation'])     { showNotation     = options['showNotation']; };
+    if (options['boardWidth'])       { boardWidth       = options['boardWidth']; };
+    if (options['pieceTheme'])       { pieceTheme       = options['pieceTheme']; };
+    if (options['imgPath'])          { imgPath          = options['imgPath']; };
+    if (options['notationStyle'])    { notationStyle    = options['notationStyle']; };
+    if (options['divStyle'])         { divStyle         = options['divStyle']; };
+    if (options['orientation'])      { orientation      = options['orientation']; };
+    if (options['pgnFormat'])        { pgnFormat        = options['pgnFormat']; };
+  };
+
+  function parsePGN_Board(bd, bx, pgn) {
+// Parsing the pgn data.
+// We construct the move tree for replay and the pgnHtml for display at the same time.
+// Result is the pgnHtml, the move tree is stored directly in the board.
+// In some stacks for each nested variation we keep track of:
+// - the moves (for replay later)
+// - the prefix (for the onclick-event of the moves in the pgnHtml)
+// - the player to move (for correctly increasing move numbers)
+// - the moveNumber (for display in pgnHtml)
+// We also keep track of parsing inside a comment and wether moves are interrupted
+// by comments or variations.
+    var noErrorsSoFar = true;
+    var height = 0;
+    var moveStack = [];
+    var playerStack = [];
+    var moveNumberStack = [];
+    var prefixStack = [];
+    var moves = [];
+    var player = bd.fens[0].split(' ')[1];
+    var moveNumber = parseInt(bd.fens[0].split(' ')[5]);
+    var prefix = ' onclick="ChessDiagram.position(' + bx + ',['
+    var insideComment = false;
+    var movesInterrupted = true;
+    var pgnHtml = '<span id="' + bd.id + '_x"></span>';
+    var mv = '';
+    var movePtr = [];
+    if (pgnFormat != '0') { pgnHtml += '<b>'; };
+
+// Replace end of line comments by parenthesis. So there is only one type of comments.
+    var L = pgn.replace(/;([^\r]*)\r/g, '{$1}');
+// Ensure all tokens (especially parenthesis) are separated by white space.
+    L = L.replace(/([\(\)\{\}])/g, ' $1 ');
+// Normalize white spaces (to one space) and split.
+    L = L.replace(/\s+/g, ' ').split(' ');
+    for (var i=0;i<L.length;i++) {
+      if (insideComment) {
+        if (L[i] == '}') {
+// End of comment. 
+          if (pgnFormat != '0') { 
+            pgnHtml += ((height == 0) ? '<br /><b>' : '<i>');
+          };
+          insideComment = false;
+          movesInterrupted = true;
+        } else {
+// Token inside comment is simply passed through to pgnHtml
+// Give a warning if parenthesis may be unbalanced.
+          if (L[i] == '{') {
+            alert('"{" inside comment! ' + bd.id + ' ' + 
+                   moveNumber + ' ' + height + ' ' + movePtr2String(movePtr));
+          };
+          pgnHtml += L[i] + ' ';
+        };
+      } else {
+        if (L[i] == '{') {
+// Begin of comment.
+          if (pgnFormat != '0') {
+// The first interruption in main line should begin in a new line!
+            pgnHtml += (height == 0) ? (movesInterrupted ? '</b>' : '</b><br />') : '</i>';
+          };
+          insideComment = true;
+        } else if (L[i] == '(') {
+// Begin of variation. Push the stacks.
+          moveStack[height] = moves;
+          prefixStack[height] = prefix;
+          playerStack[height] = player;
+          moveNumberStack[height] = moveNumber;
+          prefix +=  moves.length + ',';
+          movePtr[height] = moves.length;
+          moves[moves.length] = [];
+          moves = moves[moves.length-1];
+          player = (player=='w') ? 'b' : 'w';
+          if (player == 'b') { moveNumber -= 1; };
+          if (pgnFormat != '0') {
+            if (height == 0) {
+// The first interruption in main line should begin in a new line!
+              pgnHtml += (movesInterrupted ? '</b>' : '</b><br />')
+                         + '<span id="' + bd.id + movePtr2String(movePtr) 
+                         + '_x" style="color:black"><i> ( ';
+            } else {
+              pgnHtml += '</i><span id="' + bd.id + movePtr2String(movePtr) 
+                         + '_x" style="color:black"><i> ( ';
+            };
+          } else {
+            pgnHtml += '<span id="' + bd.id + movePtr2String(movePtr) + '_x" style="color:black"> ( ';
+          };
+          height += 1;
+          movesInterrupted = true;
+        } else if (L[i] == ')') {
+// End of variation. Pop the stacks.
+          movePtr.length = height;
+          height -= 1;
+          if (height < 0) {
+            alert(bd.id + ': )?');
+            height = 0;
+          }; 
+          moves = moveStack[height];
+          prefix = prefixStack[height];
+          player = playerStack[height];
+          moveNumber = moveNumberStack[height];
+          if (pgnFormat != '0') { 
+            pgnHtml += ((height == 0) ? ')</i></span><br /><b>' : ') </i></span><i>'); 
+          } else {
+            pgnHtml += ')</span> ';
+          };
+          movesInterrupted = true;
+        } else if (/\$\d+/.test(L[i])){
+// Numeric Annotation Glyph
+          var n = parseInt(L[i].substr(1, L[i].length-1));
+          if ((n > 0) && (n < NAG.length)) {
+            if (pgnFormat != '0') {
+              pgnHtml += (height == 0) ? ('</b>' + NAG[n] + ' <b>') : NAG[n] + ' ';
+            } else {
+              pgnHtml += NAG[n] + ' ';
+            };
+          };
+        } else {            
+// We completely ignore move numbers in pgn data and make our own!
+          mv = translateIn(L[i].replace(/^\d*\.*/, ''));
+          if (castlingPattern.test(mv) ||
+              pieceMovePattern.test(mv) ||
+              pawnMovePattern.test(mv) ||
+// Allow "pass" in pgn data (for demonstrations):
+              (mv == '-')) {
+            if (player=='w') {
+              pgnHtml += moveNumber + '. ';
+              player = 'b';
+            } else {
+              if (movesInterrupted) {
+                pgnHtml += moveNumber + '... ';
+              };
+              player = 'w';
+              moveNumber += 1;
+            };
+            movePtr[height] = moves.length;
+            pgnHtml += '<span id="' + bd.id + movePtr2String(movePtr) + '" style="color:black"' +
+                       prefix + moves.length + '])">' + 
+                       translateOut(mv, ((player=='w')?'b':'w')) + ' </span>'
+            moves[moves.length] = mv;
+            movesInterrupted = false;
+          } else {
+            if ((mv != '') && (!resultPattern.test(L[i])) && noErrorsSoFar) { 
+              alert(languageIn + '?:' + mv + ' ' + bd.id + ' ' +
+                    moveNumber + ' ' + height + ' ' + movePtr2String(movePtr));
+              noErrorsSoFar = false;
             };
           };
         };
-      } else {
-        if (bd.movePtr > 0) {
-          bd.movePtr -= 1;
-          if (typeof(bd.lineMoves[bd.movePtr]) != 'string') {
-            bd.movePtr -= 1;
-          };
-        };
       };
-      bd.dragPromotion = '';
-      if (bd.movePtr < bd.lineMoves.length) {
-        newFen = bd.lineFens[bd.movePtr];
-      } else {
-        if (typeof(bd.lineMoves[bd.movePtr-1]) != 'string') {
-          newFen = makeMove(bd.lineFens[bd.movePtr-2], bd.lineMoves[bd.movePtr-2]);
-        } else {
-          newFen = makeMove(bd.lineFens[bd.movePtr-1], bd.lineMoves[bd.movePtr-1]);
-        };
+    };
+    if (pgnFormat != '0') { pgnHtml += '</b>'; };
+// Warning, if height > 0 or insideComment
+    if (height != 0) { alert(bd.id + ': (?'); };
+    if (insideComment) { alert(bd.id + ': }?'); };
+
+    bd.moves = moves;
+    return pgnHtml;
+  };
+
+  function htmlDisplay_Board(bd, bx, pgnHtml, header, footer) {
+// Constructing html for the board and controls.
+    var html;
+    if (showNotation==1) {
+// Setup a frame for the traditional notation.
+      html = header + '<table border="0" cellpadding="0" cellspacing="0" align="center"' +
+               'style="' + notationStyle + '">' + 
+               '<tr id="' + bd.id + '_table">' +
+               '<th>&nbsp;&nbsp;&nbsp;</th><th>a</th><th>b</th><th>c</th><th>d</th>' +
+               '<th>e</th><th>f</th><th>g</th><th>h</th><th>&nbsp;&nbsp;&nbsp;</th></tr>' +
+               '<tr><th valign="middle">8</th><td colspan="8" rowspan="8">' +
+               '<div id="' + bd.id + '_board" style="width:' + boardWidth + '"></div>' +
+               '</td><th valign="middle">8</th></tr>' +
+               '<tr><th valign="middle">7</th><th valign="middle">7</th></tr>' +
+               '<tr><th valign="middle">6</th><th valign="middle">6</th></tr>' +
+               '<tr><th valign="middle">5</th><th valign="middle">5</th></tr>' +
+               '<tr><th valign="middle">4</th><th valign="middle">4</th></tr>' +
+               '<tr><th valign="middle">3</th><th valign="middle">3</th></tr>' +
+               '<tr><th valign="middle">2</th><th valign="middle">2</th></tr>' +
+               '<tr><th valign="middle">1</th><th valign="middle">1</th></tr>' +
+               '<tr><th>&nbsp</th><th>a</th><th>b</th><th>c</th><th>d</th>' +
+               '<th>e</th><th>f</th><th>g</th><th>h</th><th>&nbsp;</th></tr></table>';
+    } else {
+// No extra frame for notation.
+      html = header + '<br /><div id="' + bd.id + '_board" style="width:' + boardWidth + '"></div>';
+    };
+// Adding controls at the bottom.
+    html += '<input type="button" onclick="ChessDiagram.setOrientation(' + bx + ', \'flip\');" value="&#x21bb" />' +
+            '<input type="button" onclick="ChessDiagram.show(' + bx + ', 0);" value="|&lt;&lt;" />';
+    if (bd.moves.length > 0) {
+      html += 
+         '<input type="button" onclick="ChessDiagram.show(' + bx + ', 1);" value=" &gt; " />' +
+         '<input type="button" onclick="ChessDiagram.show(' + bx + ',-1);" value=" &lt; " />';
+      if (!document.getElementById(bd.id + '_pgn')) {
+        html += '<input type="button" onclick="ChessDiagram.togglePGN(' + bx + ');" value=" + " />';
       };
-      bd.board.position(newFen);
-      document.getElementById(bd.id + '_num').innerHTML = 
-        newFen.split(' ')[5] + '.';
-      document.getElementById(bd.id + '_col').src = 
-        imgPath + newFen.split(' ')[1] + '.png';
+    };
+    html = html +
+         '&nbsp;<span id="' + bd.id + '_num">' + bd.fens[0].split(' ')[5] + '.</span>' +
+         '&nbsp;<img id="' + bd.id + '_col" width="8" src="' + 
+         imgPath + bd.fens[0].split(' ')[1] + '.png" />&nbsp;&nbsp;' +
+         footer + '<br />';
+// Display interactive pgn.
+    if (document.getElementById(bd.id + '_pgn')) {
+      document.getElementById(bd.id + '_pgn').innerHTML = pgnHtml;
+    } else {
+      html += '<span id="' + bd.id + '_pgn" style="display:none">' + pgnHtml + '</span>';
+    };
+    document.getElementById(bd.id).innerHTML = html;
+    if (divStyle != '-') {
+      for (var key in divStyle) { document.getElementById(bd.id).style[key] = divStyle[key]; };
+    };
+  };
+
+// Public ------------------------------------------------------------------------------
+  return {
+
+    togglePGN: function(bx) {
+// If there is no pgnDiv given, the pgn can be shown below the board.
+// This function is invoked by a button to toggle the display on and off.
+      togglePGN_Board(boards[bx]);
+    },
+
+    setOrientation: function(bx, side) {
+// Sets the orientation of the board.
+// Side is 'white', 'black', or 'flip'.
+      setOrientation_Board(boards[bx], side);
+    },
+
+    position: function(bx, newMovePtr) {
+// newMovePtr is an array to select a move in the move tree.
+// This move will be visualized and its line will become the
+// current line of the diagram.
+      position_Board(boards[bx], newMovePtr);
+    },
+
+    show: function (bx, pos) {
+// Advance or Rewind the position of board bd
+//  - to starting position (pos = 0),
+//  - to next position (pos > 0) or 
+//  - to previous position (else).
+      advRew_Board(boards[bx], pos);
     },
 
     diagram: function (id, fen, pgn, header, footer, options) {
-// Generate a chess diagram in div tag with id "id".
-// The starting position is giben by a fen string "fen".
+// Generate a chess diagram in the div tag with id "id".
+// The starting position is given by a fen string "fen".
 // A move list is given by "pgn" (see comment in "makeMove" for accepted values).
 // "header" and "footer" are html strings displayed above and below the diagram.
-// options may be used to override default values (the new values will hold
+// Options may be used to override default values (the new values will hold
 // until they are changed in another call to "diagram").
 
-      if (options) {
-        if (options['languageIn'])    { languageIn    = options['languageIn']; };
-        if (options['languageOut'])   { languageOut   = options['languageOut']; };
-        if (options['showNotation'])  { showNotation  = options['showNotation']; };
-        if (options['boardWidth'])    { boardWidth    = options['boardWidth']; };
-        if (options['pieceTheme'])    { pieceTheme    = options['pieceTheme']; };
-        if (options['imgPath'])       { imgPath       = options['imgPath']; };
-        if (options['notationStyle']) { notationStyle = options['notationStyle']; };
-        if (options['divStyle'])      { divStyle      = options['divStyle']; };
-      };
-      var bd = boards.length;
+      if (options) {getOptions(options)};
+
       if (!header) { header = ''; };
       if (!footer) { footer = ''; };
-      var demoBoard = {};
-      boards[bd] = demoBoard;
-      demoBoard.fens = [fen];
-      demoBoard.id = id;
-      demoBoard.dragPromotion = '';
 
-// ensure all tokens are separated by white space
-      var L = pgn.replace(/([\(\)])/g, ' $1 ');
-/* input language support
-Czech      P J S V D K 
-Danish     B S L T D K 
-Dutch      O P L T D K 
-English    P N B R Q K   default + internal
-Estonian   P R O V L K 
-Finnish    P R L T D K 
-French     P C F T D R 
-German     B S L T D K 
-Hungarian  G H F B V K 
-Icelandic  P R B H D K 
-Italian    P C A T D R 
-Norwegian  B S L T D K 
-Polish     P S G W H K 
-Portuguese P C B T D R 
-Romanian   P C N T D R 
-Spanish    P C A T D R 
-Swedish    B S L T D K 
-*/
-      switch (languageIn) {
-        case "German":
-        case "Danish":
-        case "Norwegian":
-        case "Swedish":
-          L = L.replace(/B/g, 'P').replace(/S/g, 'N').replace(/L/g, 'B').replace(/T/g, 'R').replace(/D/g, 'Q');
+      var bx = boards.length;
+// if the id is in use, overwrite the old board in order to free the space
+      for (var i=0;i<boards.length;i++) {
+        if (boards[i].id == id) {
+          bx = i;
           break;
-        case "Czech":
-          L = L.replace(/J/g, 'N').replace(/S/g, 'B').replace(/V/g, 'R').replace(/D/g, 'Q');
-          break;
-        case "Finnish":
-          L = L.replace(/R/g, 'N').replace(/L/g, 'B').replace(/T/g, 'R').replace(/D/g, 'Q');
-          break;
-        case "French":
-          L = L.replace(/C/g, 'N').replace(/F/g, 'B').replace(/D/g, 'Q').replace(/R/g, 'K').replace(/T/g, 'R');
-          break;
-        case "Hungarian":
-          L = L.replace(/G/g, 'P').replace(/H/g, 'N').replace(/B/g, 'R').replace(/V/g, 'Q').replace(/F/g, 'B');
-          break;
-        case "Icelandic":
-          L = L.replace(/R/g, 'N').replace(/H/g, 'R').replace(/D/g, 'Q');
-          break;
-        case "Italian":
-        case "Spanish":
-          L = L.replace(/C/g, 'N').replace(/A/g, 'B').replace(/D/g, 'Q').replace(/R/g, 'K').replace(/T/g, 'R');
-          break;
-        case "Polish":
-          L = L.replace(/S/g, 'N').replace(/G/g, 'B').replace(/W/g, 'R').replace(/H/g, 'Q');
-          break;
-        case "Portuguese":
-          L = L.replace(/C/g, 'N').replace(/D/g, 'Q').replace(/R/g, 'K').replace(/T/g, 'R');
-          break;
-        case "Romanian":
-          L = L.replace(/N/g, 'B').replace(/D/g, 'Q').replace(/R/g, 'K').replace(/T/g, 'R').replace(/C/g, 'N');
-          break;
-        case "Dutch":
-          L = L.replace(/P/g, 'N').replace(/L/g, 'B').replace(/T/g, 'R').replace(/D/g, 'Q').replace(/O/g, 'P');
-          L = L.replace(/P-P-P/g, 'O-O-O').replace(/P-P/g, 'O-O');
-          break;
-        case "Estonian":
-          L = L.replace(/R/g, 'N').replace(/O/g, 'B').replace(/V/g, 'R').replace(/L/g, 'Q');
-          L = L.replace(/B-B-B/g, 'O-O-O').replace(/B-B/g, 'O-O');
-          break;
-      };
-      L = L.replace(/\s+/g, ' ').split(' ');
-// build move tree from PGN data
-      var moveList = [];
-      var height = 0;
-      var moves = [];
-      for (var i=0;i<L.length;i++) {
-        L[i] = L[i].replace(/^\d*\.*/, '');
-        if (L[i]=='(') {
-          moves[moves.length] = [];
-          moveList[height] = moves;
-          moves = moves[moves.length-1];
-          height += 1;
-        } else if (L[i]==')') {
-          height -= 1;
-          moves = moveList[height];
-        } else if (castlingPattern.test(L[i]) ||
-                   pieceMovePattern.test(L[i]) ||
-                   pawnMovePattern.test(L[i])) {
-          moves[moves.length] = L[i];
         };
       };
-      demoBoard.moves = moves;
-      var html;
-      if (showNotation==1) {
-        html = header + '<table border="0" cellpadding="0" cellspacing="0" align="center"' +
-                 'style="' + notationStyle + '">' +
-                 '<tr><th>&nbsp;&nbsp;&nbsp;</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th><th>h</th><th>&nbsp;&nbsp;&nbsp;</th></tr>' +
-                 '<tr><th valign="middle">8</th><td colspan="8" rowspan="8">' +
-                 '<div id="' + id + '_board" style="width:' + boardWidth + '"></div>' +
-                 '</td><th valign="middle">8</th></tr>' +
-                 '<tr><th valign="middle">7</th><th valign="middle">7</th></tr>' +
-                 '<tr><th valign="middle">6</th><th valign="middle">6</th></tr>' +
-                 '<tr><th valign="middle">5</th><th valign="middle">5</th></tr>' +
-                 '<tr><th valign="middle">4</th><th valign="middle">4</th></tr>' +
-                 '<tr><th valign="middle">3</th><th valign="middle">3</th></tr>' +
-                 '<tr><th valign="middle">2</th><th valign="middle">2</th></tr>' +
-                 '<tr><th valign="middle">1</th><th valign="middle">1</th></tr>' +
-                 '<tr><th>&nbsp</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th><th>h</th><th>&nbsp;</th></tr></table>' +
-                 '<input type="button" onclick="ChessDiagram.show(' + bd + ', 0);" value="| &lt;" />';
-      } else {
-        html = header +
-                 '<br /><div id="' + id + '_board" style="width:' + boardWidth + '"></div>' +
-                 '<input type="button" onclick="ChessDiagram.show(' + bd + ', 0);" value="| &lt;" />';
-      };
+      boards[bx] = {fens: [fen], id: id, dragPromotion: '',
+                    lineMove: 0, movePtr: ['x'], showPGN: false};
 
-      if (demoBoard.moves.length > 0) {
-        html = html +
-           '<input type="button" onclick="ChessDiagram.show(' + bd + ', 1);" value=" &gt; " />' +
-           '<input type="button" onclick="ChessDiagram.show(' + bd + ',-1);" value=" &lt; " />' +
-           '<input type="button" onclick="ChessDiagram.togglePGN(' + bd + ');" value=" + " />';
-      };
-      html = html +
-           '&nbsp;<span id="' + id + '_num">' + fen.split(' ')[5] + '.</span>' +
-           '&nbsp;<img id="' + id + '_col" width="8" src="' + imgPath + fen.split(' ')[1] + '.png" />&nbsp;&nbsp;' +
-           footer + '<br />';
-// interactive move tree
-      html = html + '<span id="' + id + '_pgn" style="display:none">' +
-             moveTree(moves, ' <span onclick="ChessDiagram.m(' + bd + ',[',
-             parseInt(fen.split(' ')[5]), fen.split(' ')[1]) + 
-             '</span>';
-      document.getElementById(id).innerHTML = html;
-      if (divStyle != '-') {
-        for (var key in divStyle) { document.getElementById(id).style[key] = divStyle[key]; };
-      };
-      demoBoard.board =  new ChessBoard(id + '_board', {
+      var pgnHtml = parsePGN_Board(boards[bx], bx, pgn);
+
+// Construct html for the board and controls.
+      htmlDisplay_Board(boards[bx], bx, pgnHtml, header, footer);
+
+      boards[bx].board =  new ChessBoard(id + '_board', {
                                         draggable:     true, 
                                         dropOffBoard:  'trash', 
                                         showNotation:  (showNotation==2),
                                         pieceTheme:    pieceTheme, 
                                         position:      fen,
+                                        orientation:   orientation,
                                         onDrop:        function(source, target, piece, newPos, oldPos, orientation) {
-                                                         return onDrop(bd, source, target, piece); },
-                                        onSnapEnd:     function() { onSnapEnd(bd); },
-                                        onSnapbackEnd: function() { onSnapEnd(bd); }
+                                                         return onDrop(bx, source, target, piece); },
+                                        onSnapEnd:     function() { onSnapEnd(bx); },
+                                        onSnapbackEnd: function() { onSnapEnd(bx); }
                                         } );
-      demoBoard.movePtr = 0;
-      demoBoard.lineFens = demoBoard.fens;
-      demoBoard.lineMoves = demoBoard.moves;
-      demoBoard.showPGN = false;
+      boards[bx].lineFens = boards[bx].fens;
+      boards[bx].lineMoves = boards[bx].moves;
     }
   };
 } () ;
